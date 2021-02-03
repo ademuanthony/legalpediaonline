@@ -12,5 +12,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Legalpedia.Core\Legalpedia.Core.csproj" />
+    <ProjectReference Include="..\Legalpedia.EntityFrameworkCore\Legalpedia.EntityFrameworkCore.csproj" />
   </ItemGroup>
 </Project>
