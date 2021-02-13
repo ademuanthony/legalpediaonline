@@ -1,12 +1,10 @@
 ﻿using Abp.Application.Services.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Abp.AutoMapper;
+using Legalpedia.Models;
 
 namespace Legalpedia.FormsAndPrecedence.Dtos
 {
+    [AutoMapFrom(typeof(FormsPrecedence))]
     public class FormsAndPrecedenceDto:EntityDto
     {
         public string Uuid { get; set; }
