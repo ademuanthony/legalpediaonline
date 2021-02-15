@@ -5,6 +5,8 @@ using Legalpedia.Authorization.Users;
 using Legalpedia.MultiTenancy;
 using Abp.Localization;
 using Legalpedia.Models;
+using System.Linq;
+using System.ComponentModel.DataAnnotations;
 
 namespace Legalpedia.EntityFrameworkCore
 {
@@ -71,6 +73,24 @@ namespace Legalpedia.EntityFrameworkCore
             modelBuilder.Entity<ApplicationLanguageText>()
                 .Property(p => p.Value)
                 .HasMaxLength(100); // any integer that is smaller than 10485760
+        }
+
+        public override int SaveChanges()
+        {
+            var entities = from e in ChangeTracker.Entries()
+                           where e.State == EntityState.Added
+                               || e.State == EntityState.Modified
+                           select e.Entity;
+            foreach (var entity in entities)
+            {
+                var validationContext = new ValidationContext(entity);
+                Validator.ValidateObject(
+                    entity,
+                    validationContext,
+                    validateAllProperties: true);
+            }
+
+            return base.SaveChanges();
         }
     }
 }
