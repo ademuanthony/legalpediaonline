@@ -8,7 +8,7 @@ namespace Legalpedia.Models
     public class Category:Entity
     {
         [Key] 
-        [Column("CategoryID")]
+        [Column("CategoryId")]
         public override int Id { get; set; }
 
         [Column("Category")]

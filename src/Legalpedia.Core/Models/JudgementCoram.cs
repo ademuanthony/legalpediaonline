@@ -11,6 +11,7 @@ namespace Legalpedia.Models
         //[Key]
         //public override int Id { get; set; }
 
+        [Column("CoramID")]
         public int CoramId
         {
             get; set; 

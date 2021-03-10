@@ -20,6 +20,7 @@ namespace Legalpedia.Models
 
         public string Coram { get; set; }
 
+        [NotMapped]
         public List<string> Smis { get; set; }
 
     }
