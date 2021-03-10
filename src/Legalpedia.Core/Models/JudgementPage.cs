@@ -6,8 +6,5 @@ namespace Legalpedia.Models {
         public string SuitNumber { get; set; }
         public string Content { get; set; }
         public int Number { get; set; }
-        
-        [ForeignKey(nameof(SuitNumber))]
-        public Judgement Summary { get; set; }
     }
 }

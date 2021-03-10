@@ -28,7 +28,7 @@ namespace Legalpedia.Judgements
             _pageRepositry = pageRepositry;
         }
 
-        public JudgementDto Post(Judgement judgement)
+        public JudgementDto Post(JudgementDto judgement)
         {
             var updateCotnent = new UpdateContentDto<SharedJudgement>();
             
@@ -39,9 +39,13 @@ namespace Legalpedia.Judgements
             }
             else
             {
-                judgement.CreatedAt = DateTime.Now;
-                judgement.UpdatedAt = DateTime.Now;
-                Repository.Insert(judgement);
+                Repository.Insert(new Judgement
+                {
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Body = judgement.Body,
+                    Id = judgement.Id
+                });
                 updateCotnent.IsNewRecord = true;
             }
 
@@ -56,7 +60,7 @@ namespace Legalpedia.Judgements
         }
 
 
-        public JudgementDto Put(Judgement judgement)
+        public JudgementDto Put(JudgementDto judgement)
         {
             var oldRecord = Repository.FirstOrDefault(r => r.Id == judgement.Id);
             if (oldRecord != null)

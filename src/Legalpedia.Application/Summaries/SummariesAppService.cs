@@ -15,6 +15,7 @@ using JudgementPartiesA = Legalpedia.Models.JudgementPartiesA;
 using JudgementPartiesB = Legalpedia.Models.JudgementPartiesB;
 using UploadResultDto = Legalpedia.Shared.Dto.UploadResultDto;
 using System.ComponentModel.DataAnnotations;
+using Legalpedia.Judgements.Dto;
 using Legalpedia.Summaries.Dtos;
 
 namespace Legalpedia.Summaries
@@ -137,7 +138,7 @@ namespace Legalpedia.Summaries
 
                 if (!input.JudgementBody.IsNullOrEmpty())
                 {
-                    _judgementsAppService.Post(new Judgement { Body = input.JudgementBody, Id = input.Summary.Id });
+                    _judgementsAppService.Post(new JudgementDto { Body = input.JudgementBody, Id = input.Summary.Id });
                 }
 
                 //fetch the summary
@@ -364,7 +365,7 @@ namespace Legalpedia.Summaries
 
             if (!input.JudgementBody.IsNullOrEmpty())
             {
-                _judgementsAppService.Put(new Judgement { Body = input.JudgementBody, Id = input.Summary.Id});
+                _judgementsAppService.Put(new JudgementDto { Body = input.JudgementBody, Id = input.Summary.Id});
             }
 
             //fetch the summary

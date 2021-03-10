@@ -27,6 +27,7 @@ namespace Legalpedia.EntityFrameworkCore
         public DbSet<HoldenAt> HoldenAts { get; set; }
         public DbSet<Index> Indices { get; set; }
         public DbSet<Judgement> Judgements { get; set; }
+        public DbSet<JudgementPage> JudgementPages { get; set; }
         public DbSet<JudgementCoram> JudgementCorams { get; set; }
         public DbSet<JudgementCounsel> JudgementCounsels { get; set; }
         public DbSet<JudgementPartiesA> JudgementPartiesAs { get; set; }
