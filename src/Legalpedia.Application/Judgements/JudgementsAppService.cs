@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
+using Abp.Domain.Repositories;
 using Abp.UI;
 using Legalpedia.EntityFrameworkCore.Repositories;
 using Legalpedia.Judgements.Dto;
@@ -16,12 +18,14 @@ namespace Legalpedia.Judgements
         JudgementDto, string,
         PagedResultRequestDto, CreateJudgementDto, UpdateJudgementDto>, IJudgementsAppService
     {
-        private IJudgementRepository _repository; 
+        private readonly IJudgementRepository _repository;
+        private readonly IRepository<JudgementPage, string> _pageRepositry;
 
-        public JudgementsAppService(IJudgementRepository repository)
+        public JudgementsAppService(IJudgementRepository repository, IRepository<JudgementPage, string> pageRepositry)
             : base(repository)
         {
             _repository = repository;
+            _pageRepositry = pageRepositry;
         }
 
         public JudgementDto Post(Judgement judgement)
@@ -39,6 +43,12 @@ namespace Legalpedia.Judgements
                 judgement.UpdatedAt = DateTime.Now;
                 Repository.Insert(judgement);
                 updateCotnent.IsNewRecord = true;
+            }
+
+            foreach (var page in judgement.Pages)
+            {
+                page.SuitNumber = judgement.Id;
+                _pageRepositry.Insert(page);
             }
             
 
@@ -59,7 +69,12 @@ namespace Legalpedia.Judgements
             {
                 throw new UserFriendlyException("Invalid suit number");
             }
-
+            _pageRepositry.Delete(p => p.SuitNumber == judgement.Id);
+            foreach (var page in judgement.Pages)
+            {
+                page.SuitNumber = judgement.Id;
+                _pageRepositry.Insert(page);
+            }
             return judgement.MapTo<JudgementDto>();
         }
 
@@ -82,6 +97,11 @@ namespace Legalpedia.Judgements
                     SuitNo = j.Id, CaseTitle = j.Body.Substring(0, 300)
                 });
             return new PagedResultDto<JudgementListItem>(totalCount, juedgements.ToList());
+        }
+
+        public List<JudgementPage> GetPages(EntityDto<string> entityDto)
+        {
+            return _pageRepositry.GetAll().Where(p => p.SuitNumber == entityDto.Id).ToList();
         }
     }
 }

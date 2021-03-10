@@ -1,4 +1,5 @@
-﻿using Abp.Application.Services;
+﻿using System.Collections.Generic;
+using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Legalpedia.Judgements.Dto;
 using Legalpedia.Models;
@@ -12,5 +13,6 @@ namespace Legalpedia.Judgements
         JudgementDto Post(Judgement input);
         JudgementDto Put(Judgement input);
         PagedResultDto<JudgementListItem> GetJudgements(GetJudgementRequest input);
+        List<JudgementPage> GetPages(EntityDto<string> entityDto);
     }
 }
