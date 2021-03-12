@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Legalpedia.Models;
 
 namespace Legalpedia.Summaries.Dtos
 {
@@ -49,5 +50,6 @@ namespace Legalpedia.Summaries.Dtos
 
         // the body is populated only for the details endpoint
         public string JudgementBody { get; set; }
+        public List<JudgementPage> Pages { get; set; }
     }
 }

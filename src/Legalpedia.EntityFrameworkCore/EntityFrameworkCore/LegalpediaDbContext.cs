@@ -17,6 +17,8 @@ namespace Legalpedia.EntityFrameworkCore
         public DbSet<TeamMember> TeamMembers { get; set; }
         public DbSet<AreaOfLaw> AreaOfLaws { get; set; }
         public DbSet<Article> Articles { get; set; }
+        public DbSet<Bookmark> Bookmarks { get; set; }
+        public DbSet<BookmarkCollection> BookmarkCollections { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Coram> Corams { get; set; }
         public DbSet<Court> Courts { get; set; }

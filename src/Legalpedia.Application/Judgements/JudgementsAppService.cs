@@ -5,6 +5,7 @@ using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
 using Abp.Domain.Repositories;
+using Abp.Extensions;
 using Abp.UI;
 using Legalpedia.EntityFrameworkCore.Repositories;
 using Legalpedia.Judgements.Dto;
@@ -82,6 +83,61 @@ namespace Legalpedia.Judgements
             return judgement.MapTo<JudgementDto>();
         }
 
+        public bool PaginateAll()
+        {
+            var ids = _repository.GetAll().Select(s => s.Id).ToList();
+            return ids.All(id => Paginate(new EntityDto<string>(id)));
+        }
+        public bool Paginate(EntityDto<string> input)
+        {
+            var judgement = Repository.FirstOrDefault(j => j.Id == input.Id);
+            if (judgement == null)
+            {
+                throw new UserFriendlyException("Case not found");
+            }
+            
+            _pageRepositry.Delete(p=>p.SuitNumber == input.Id); // TODO: make this explicit
+
+            var body = "";
+            var pages = judgement.Body.Split("PAGE|");
+            foreach (var page in pages)
+            {
+                var lines = page.Split("\r\n").ToList();
+                var fLine = lines[0].Trim('\r', ' ');
+                if (fLine.Length <= 2 && int.TryParse(fLine, out var _))
+                {
+                    lines.RemoveAt(0);
+                }
+
+                lines = lines.Where(l => !l.IsNullOrEmpty()).ToList();
+                body += " " + string.Join("\r\n", lines.ToArray());
+            }
+
+            body = body.Trim();
+            body = body.Replace("\r\n\r\n", "\r\n");
+            var words = body.Split(' ');
+            int pageNumer = 0;
+            var l = 250;
+            for (var i = 0; i < words.Length; i+=l)
+            {
+                if (i+l > words.Length)
+                {
+                    l = words.Length - i;
+                }
+                var pageWords = new string[l];
+                Array.Copy(words, i, pageWords, 0, l);
+                var content = string.Join(' ', pageWords);
+                _pageRepositry.Insert(new JudgementPage
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Content = content,
+                    SuitNumber = input.Id,
+                    Number = ++pageNumer
+                });
+            }
+            return true;
+        }
+        
         public PagedResultDto<JudgementListItem> GetJudgements(GetJudgementRequest input)
         {
             if (input.Query == GetJudgementRequest.QueryNoSummary)

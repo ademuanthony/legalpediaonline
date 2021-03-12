@@ -14,5 +14,7 @@ namespace Legalpedia.Judgements
         JudgementDto Put(JudgementDto input);
         PagedResultDto<JudgementListItem> GetJudgements(GetJudgementRequest input);
         List<JudgementPage> GetPages(EntityDto<string> entityDto);
+        bool PaginateAll();
+        bool Paginate(EntityDto<string> input);
     }
 }
