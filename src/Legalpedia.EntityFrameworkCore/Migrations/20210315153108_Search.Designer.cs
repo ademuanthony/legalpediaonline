@@ -3,15 +3,17 @@ using System;
 using Legalpedia.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Legalpedia.Migrations
 {
     [DbContext(typeof(LegalpediaDbContext))]
-    partial class LegalpediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210315153108_Search")]
+    partial class Search
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2651,8 +2653,10 @@ namespace Legalpedia.Migrations
 
             modelBuilder.Entity("Legalpedia.Models.SearchHistory", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp without time zone");

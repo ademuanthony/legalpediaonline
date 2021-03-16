@@ -17,6 +17,8 @@ namespace Legalpedia.EntityFrameworkCore
         public DbSet<TeamMember> TeamMembers { get; set; }
         public DbSet<AreaOfLaw> AreaOfLaws { get; set; }
         public DbSet<Article> Articles { get; set; }
+        public DbSet<Bookmark> Bookmarks { get; set; }
+        public DbSet<BookmarkCollection> BookmarkCollections { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Coram> Corams { get; set; }
         public DbSet<Court> Courts { get; set; }
@@ -24,9 +26,11 @@ namespace Legalpedia.EntityFrameworkCore
         public DbSet<Dictionary> Dictonaries { get; set; }
         public DbSet<ForeignLegalResource> ForeignLegalResources { get; set; }
         public DbSet<FormsPrecedence> FormsPrecedences { get; set; }
+        public DbSet<Highlight> Highlights { get; set; }
         public DbSet<HoldenAt> HoldenAts { get; set; }
         public DbSet<Index> Indices { get; set; }
         public DbSet<Judgement> Judgements { get; set; }
+        public DbSet<JudgementPage> JudgementPages { get; set; }
         public DbSet<JudgementCoram> JudgementCorams { get; set; }
         public DbSet<JudgementCounsel> JudgementCounsels { get; set; }
         public DbSet<JudgementPartiesA> JudgementPartiesAs { get; set; }

@@ -3,15 +3,17 @@ using System;
 using Legalpedia.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Legalpedia.Migrations
 {
     [DbContext(typeof(LegalpediaDbContext))]
-    partial class LegalpediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210312150456_PageNumber")]
+    partial class PageNumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1572,8 +1574,8 @@ namespace Legalpedia.Migrations
                     b.Property<string>("CollectionId")
                         .HasColumnType("text");
 
-                    b.Property<int>("PageNumber")
-                        .HasColumnType("integer");
+                    b.Property<string>("PageNumber")
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .HasColumnType("text");
@@ -1785,37 +1787,6 @@ namespace Legalpedia.Migrations
                     b.HasKey("Uuid");
 
                     b.ToTable("forms_precedence");
-                });
-
-            modelBuilder.Entity("Legalpedia.Models.Highlight", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CaseId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CollectionId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Length")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PageNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("StartIndex")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Text")
-                        .HasColumnType("text");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Highlights");
                 });
 
             modelBuilder.Entity("Legalpedia.Models.HoldenAt", b =>
@@ -2651,8 +2622,10 @@ namespace Legalpedia.Migrations
 
             modelBuilder.Entity("Legalpedia.Models.SearchHistory", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp without time zone");

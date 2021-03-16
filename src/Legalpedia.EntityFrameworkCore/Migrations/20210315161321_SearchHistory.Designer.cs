@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Legalpedia.Migrations
 {
     [DbContext(typeof(LegalpediaDbContext))]
-    [Migration("20210131173607_Initial_Migration")]
-    partial class Initial_Migration
+    [Migration("20210315161321_SearchHistory")]
+    partial class SearchHistory
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -1521,6 +1521,1343 @@ namespace Legalpedia.Migrations
                     b.ToTable("AbpUsers");
                 });
 
+            modelBuilder.Entity("Legalpedia.Models.AreaOfLaw", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text")
+                        .HasColumnName("AreaOfLaw");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AreasOfLaw");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Article", b =>
+                {
+                    b.Property<string>("Uuid")
+                        .HasColumnType("text")
+                        .HasColumnName("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<int?>("VersionNo")
+                        .HasColumnType("integer")
+                        .HasColumnName("version_no");
+
+                    b.HasKey("Uuid");
+
+                    b.ToTable("articles");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Bookmark", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CaseId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CollectionId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PageNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Bookmarks");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.BookmarkCollection", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BookmarkCollections");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("CategoryId")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("Category");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Coram", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("EmailAddr")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNo")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Version")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Corams");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Court", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("Court");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Courts");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Customer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("City")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("State")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Surname")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Dictionary", b =>
+                {
+                    b.Property<string>("Uuid")
+                        .HasColumnType("text")
+                        .HasColumnName("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<int?>("VersionNo")
+                        .HasColumnType("integer")
+                        .HasColumnName("version_no");
+
+                    b.HasKey("Uuid");
+
+                    b.ToTable("dictionary");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.ForeignLegalResource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ForeignLegalResources");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.FormsPrecedence", b =>
+                {
+                    b.Property<string>("Uuid")
+                        .HasColumnType("text")
+                        .HasColumnName("uuid");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("text")
+                        .HasColumnName("category");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<int?>("VersionNo")
+                        .HasColumnType("integer")
+                        .HasColumnName("version_no");
+
+                    b.HasKey("Uuid");
+
+                    b.ToTable("forms_precedence");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Highlight", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CaseId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CollectionId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Length")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PageNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StartIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Highlights");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.HoldenAt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("HoldenAt");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HoldenAt");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Index", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("rowid")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Court")
+                        .HasColumnType("text")
+                        .HasColumnName("court");
+
+                    b.Property<string>("Header")
+                        .HasColumnType("text")
+                        .HasColumnName("header");
+
+                    b.Property<string>("JudgeDate")
+                        .HasColumnType("text")
+                        .HasColumnName("judgedate");
+
+                    b.Property<string>("Subbody")
+                        .HasColumnType("text")
+                        .HasColumnName("subbody");
+
+                    b.Property<string>("SuitNo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
+
+                    b.Property<string>("Uuid")
+                        .HasColumnType("text")
+                        .HasColumnName("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("indexes");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Judgement", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Body")
+                        .HasColumnType("text")
+                        .HasColumnName("judgement");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Judgements");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.JudgementCoram", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int>("CoramId")
+                        .HasColumnType("integer")
+                        .HasColumnName("CoramID");
+
+                    b.Property<string>("JudgementId")
+                        .HasColumnType("text")
+                        .HasColumnName("SuitNo");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CoramId");
+
+                    b.ToTable("JudgementCorams");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.JudgementCounsel", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Counsels")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JudgementCounsels");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.JudgementPage", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SuitNumber")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JudgementPages");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.JudgementPartiesA", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PartyANames")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JudgementPartiesA");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.JudgementPartiesB", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PartyBNames")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JudgementPartiesB");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.JudgementPrinciple", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int>("PrincipleId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SuitNo")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JudgementPrinciples");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.JudgementsSummary", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CasesCited")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("integer")
+                        .HasColumnName("CategoryId");
+
+                    b.Property<int?>("CourtId")
+                        .HasColumnType("integer")
+                        .HasColumnName("CourtID");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Held")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("HoldenAtId")
+                        .HasColumnType("integer")
+                        .HasColumnName("HoldenAtID");
+
+                    b.Property<string>("Issues")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("JudgementDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("LpCitation")
+                        .HasColumnType("text")
+                        .HasColumnName("LPCitation");
+
+                    b.Property<string>("OtherCitations")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("PartyATypeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("PartyATypeID");
+
+                    b.Property<int?>("PartyBTypeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("PartyBTypeID");
+
+                    b.Property<string>("StatusCited")
+                        .HasColumnType("text")
+                        .HasColumnName("StatutesCited");
+
+                    b.Property<string>("SummaryOfFacts")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Tags")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CourtId");
+
+                    b.HasIndex("HoldenAtId");
+
+                    b.HasIndex("PartyATypeId");
+
+                    b.HasIndex("PartyBTypeId");
+
+                    b.ToTable("JudgementsSummaries");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Keyword", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<DateTime>("LastIndexingDate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("last_indexing_date");
+
+                    b.Property<int>("RatioCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("ratio_count");
+
+                    b.Property<int>("ResultCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("result_count");
+
+                    b.Property<int>("SummaryCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("summary_count");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text")
+                        .HasColumnName("text");
+
+                    b.Property<DateTime>("Version")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("version");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("keywords");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.KeywordRanking", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Court")
+                        .HasColumnType("text")
+                        .HasColumnName("court");
+
+                    b.Property<string>("Header")
+                        .HasColumnType("text")
+                        .HasColumnName("header");
+
+                    b.Property<long>("IndexId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("index_id");
+
+                    b.Property<string>("JudgeDate")
+                        .HasColumnType("text")
+                        .HasColumnName("judgedate");
+
+                    b.Property<long>("KeywordId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("keyword_id");
+
+                    b.Property<long>("Rank")
+                        .HasColumnType("bigint")
+                        .HasColumnName("rank");
+
+                    b.Property<string>("Subbody")
+                        .HasColumnType("text")
+                        .HasColumnName("subbody");
+
+                    b.Property<string>("SuitNo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("keyword_rankings");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.LawOfFedPart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int>("LawId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PartHeader")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LawOfFedParts");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.LawOfFedSched", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int>("LawId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SchedBody")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SchedHeader")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LawOfFedScheds");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.LawOfFedSection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int>("LawId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PartId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SectionBody")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SectionHeader")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LawOfFedSections");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.LawOfFederation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int?>("CatId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Descr")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LawDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("LawNo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubsidiaryLegislation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Tags")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LawsOfFederation");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.LegalUpdate", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("ID")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("DATE");
+
+                    b.Property<string>("DocDate")
+                        .HasColumnType("text")
+                        .HasColumnName("DOCDATE");
+
+                    b.Property<long>("DocId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("DOCID");
+
+                    b.Property<string>("DocName")
+                        .HasColumnType("text")
+                        .HasColumnName("DOCNAME");
+
+                    b.Property<string>("DocType")
+                        .HasColumnType("text")
+                        .HasColumnName("DOCTYPE");
+
+                    b.Property<long?>("VersionNo")
+                        .HasColumnType("bigint")
+                        .HasColumnName("VERSION_NO");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("legal_update");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.License", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ExpDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("LicensedDays")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MobileSystemId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Package")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SystemId")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UnlockDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("UpdateLicensedDays")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("License");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Maxim", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<string>("Uuid")
+                        .HasColumnType("text")
+                        .HasColumnName("uuid");
+
+                    b.Property<int?>("VersionNo")
+                        .HasColumnType("integer")
+                        .HasColumnName("version_no");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("maxims");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.OneTimePassword", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("LicenseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SystemId")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("OneTimePasswords");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.OtpLicense", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("rowid")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<DateTime>("CurDate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("cur_date");
+
+                    b.Property<string>("Key")
+                        .HasColumnType("text")
+                        .HasColumnName("token");
+
+                    b.Property<DateTime>("LiveUpdate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("live_update");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("otp_license");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Package", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Days")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Features")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Permalink")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Platforms")
+                        .HasColumnType("text");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Packages");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.PartyAType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("PartyAType");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PartyATypes");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.PartyBType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("PartyBType");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PartyBTypes");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Principle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("Principle");
+
+                    b.Property<int?>("SbjMatterIdxId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Principles");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Publication", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<string>("Uuid")
+                        .HasColumnType("text")
+                        .HasColumnName("uuid");
+
+                    b.Property<int?>("VersionNo")
+                        .HasColumnType("integer")
+                        .HasColumnName("version_no");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("publications");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.ResultVote", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("IndexUuid")
+                        .HasColumnType("text")
+                        .HasColumnName("index_uuid");
+
+                    b.Property<long>("KeywordId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("keyword_id");
+
+                    b.Property<long>("Vote")
+                        .HasColumnType("bigint")
+                        .HasColumnName("vote");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("result_votes");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Rule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Section")
+                        .HasColumnType("text")
+                        .HasColumnName("section");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.Property<string>("Uuid")
+                        .HasColumnType("text")
+                        .HasColumnName("uuid");
+
+                    b.Property<int?>("VersionNo")
+                        .HasColumnType("integer")
+                        .HasColumnName("version_no");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("rules");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.SbjMatterIndex", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("SubjectMatterIndex")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SbjMatterIndex");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.SearchHistory", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SearchWord")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SearchHistories");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.SumAreasOfLaw", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int>("AreaOfLawID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SuitNo")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AreaOfLawID");
+
+                    b.ToTable("SumAreasOfLaw");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.SummaryRatio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Body")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Coram")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Heading")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SuitNo")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SummaryRatios");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Synchronization", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text")
+                        .HasColumnName("ClientId");
+
+                    b.Property<DateTime>("LastExported")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("LastImported")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("LastSynchronization")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Synchronizations");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("TagId")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text")
+                        .HasColumnName("Tag");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Team", b =>
+                {
+                    b.Property<string>("Uuid")
+                        .HasColumnType("text")
+                        .HasColumnName("uuid");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Logo")
+                        .HasColumnType("text")
+                        .HasColumnName("logo");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Uuid");
+
+                    b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.TeamMember", b =>
+                {
+                    b.Property<string>("Uuid")
+                        .HasColumnType("text")
+                        .HasColumnName("uuid");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TeamUuid")
+                        .HasColumnType("text")
+                        .HasColumnName("teamuuid");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("userid");
+
+                    b.HasKey("Uuid");
+
+                    b.HasIndex("TeamUuid");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TeamMembers");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Update", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("rowid")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int>("Count")
+                        .HasColumnType("integer")
+                        .HasColumnName("count");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("updates");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.UpdateMeta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DownloadLink")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Size")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UpdateMetas");
+                });
+
             modelBuilder.Entity("Legalpedia.MultiTenancy.Tenant", b =>
                 {
                     b.Property<int>("Id")
@@ -1802,6 +3139,100 @@ namespace Legalpedia.Migrations
                     b.Navigation("LastModifierUser");
                 });
 
+            modelBuilder.Entity("Legalpedia.Models.JudgementCoram", b =>
+                {
+                    b.HasOne("Legalpedia.Models.Coram", "Coram")
+                        .WithMany()
+                        .HasForeignKey("CoramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coram");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.JudgementsSummary", b =>
+                {
+                    b.HasOne("Legalpedia.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId");
+
+                    b.HasOne("Legalpedia.Models.Court", "Court")
+                        .WithMany()
+                        .HasForeignKey("CourtId");
+
+                    b.HasOne("Legalpedia.Models.HoldenAt", "HoldenAt")
+                        .WithMany()
+                        .HasForeignKey("HoldenAtId");
+
+                    b.HasOne("Legalpedia.Models.PartyAType", "PartyAType")
+                        .WithMany()
+                        .HasForeignKey("PartyATypeId");
+
+                    b.HasOne("Legalpedia.Models.PartyBType", "PartyBType")
+                        .WithMany()
+                        .HasForeignKey("PartyBTypeId");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Court");
+
+                    b.Navigation("HoldenAt");
+
+                    b.Navigation("PartyAType");
+
+                    b.Navigation("PartyBType");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.License", b =>
+                {
+                    b.HasOne("Legalpedia.Models.Customer", "Customer")
+                        .WithMany("Licenses")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.OneTimePassword", b =>
+                {
+                    b.HasOne("Legalpedia.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.SumAreasOfLaw", b =>
+                {
+                    b.HasOne("Legalpedia.Models.AreaOfLaw", "AreaOfLaw")
+                        .WithMany()
+                        .HasForeignKey("AreaOfLawID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AreaOfLaw");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.TeamMember", b =>
+                {
+                    b.HasOne("Legalpedia.Models.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamUuid");
+
+                    b.HasOne("Legalpedia.Authorization.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Legalpedia.MultiTenancy.Tenant", b =>
                 {
                     b.HasOne("Legalpedia.Authorization.Users.User", "CreatorUser")
@@ -1898,6 +3329,11 @@ namespace Legalpedia.Migrations
                     b.Navigation("Settings");
 
                     b.Navigation("Tokens");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Customer", b =>
+                {
+                    b.Navigation("Licenses");
                 });
 #pragma warning restore 612, 618
         }

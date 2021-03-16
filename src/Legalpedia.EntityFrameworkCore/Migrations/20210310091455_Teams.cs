@@ -2,7 +2,7 @@
 
 namespace Legalpedia.Migrations
 {
-    public partial class Team : Migration
+    public partial class Teams : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

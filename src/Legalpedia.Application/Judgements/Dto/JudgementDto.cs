@@ -1,4 +1,5 @@
-﻿using Abp.Application.Services.Dto;
+﻿using System.Collections.Generic;
+using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
 using Legalpedia.Models;
 
@@ -9,5 +10,6 @@ namespace Legalpedia.Judgements.Dto
     {
         public string Body { get; set; }
         
+        public List<JudgementPage> Pages { get; set; }
     }
 }

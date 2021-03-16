@@ -15,6 +15,7 @@ using JudgementPartiesA = Legalpedia.Models.JudgementPartiesA;
 using JudgementPartiesB = Legalpedia.Models.JudgementPartiesB;
 using UploadResultDto = Legalpedia.Shared.Dto.UploadResultDto;
 using System.ComponentModel.DataAnnotations;
+using Legalpedia.Judgements.Dto;
 using Legalpedia.Summaries.Dtos;
 
 namespace Legalpedia.Summaries
@@ -43,6 +44,7 @@ namespace Legalpedia.Summaries
         private readonly IRepository<JudgementCounsel, string> _judgementCounselRepository;
         private readonly IRepository<SumAreasOfLaw> _sumAreasOfLaw;
         private readonly IJudgementsAppService _judgementsAppService;
+        private readonly IRepository<JudgementPage, string> _pagesRepository;
         #endregion
 
         #region cntr
@@ -64,9 +66,10 @@ namespace Legalpedia.Summaries
             IRepository<JudgementCounsel, string> judgementCounselRepository, 
             IRepository<SumAreasOfLaw> sumAreasOfLaw, IJudgementsAppService judgementsAppService, 
             IRepository<SbjMatterIndex> smiRepository, IRepository<Principle> principleRepository,
-            IRepository<Category> categoryRepository)
+            IRepository<Category> categoryRepository, IRepository<JudgementPage, string> pagesRepository)
         {
             _categoryRepository = categoryRepository;
+            _pagesRepository = pagesRepository;
             _rationRepository = rationRepository;
             _summaryRepository = summaryRepository;
             _judgementCoramsRepository = judgementCoramsRepository;
@@ -137,7 +140,7 @@ namespace Legalpedia.Summaries
 
                 if (!input.JudgementBody.IsNullOrEmpty())
                 {
-                    _judgementsAppService.Post(new Judgement { Body = input.JudgementBody, Id = input.Summary.Id });
+                    _judgementsAppService.Post(new JudgementDto { Body = input.JudgementBody, Id = input.Summary.Id });
                 }
 
                 //fetch the summary
@@ -364,7 +367,7 @@ namespace Legalpedia.Summaries
 
             if (!input.JudgementBody.IsNullOrEmpty())
             {
-                _judgementsAppService.Put(new Judgement { Body = input.JudgementBody, Id = input.Summary.Id});
+                _judgementsAppService.Put(new JudgementDto { Body = input.JudgementBody, Id = input.Summary.Id});
             }
 
             //fetch the summary
@@ -729,7 +732,11 @@ namespace Legalpedia.Summaries
             var partyAType = _partyATypeRepository.FirstOrDefault(p => p.Id == summary.PartyATypeId);
             var partyBType = _partyBTypeRepository.FirstOrDefault(p => p.Id == summary.PartyBTypeId);
             var HoldenAt = _holdenAtRepository.GetAll().FirstOrDefault(h => h.Id == summary.HoldenAtId);
-            var Principles = _judgementPrinciplesRepository.GetAll().Where(jp => jp.SuitNo == summary.Id).ToList();
+            var principles = _judgementPrinciplesRepository.GetAll().Where(jp => jp.SuitNo == summary.Id).ToList();
+            var pages = _pagesRepository.GetAll()
+                .Where(p => p.SuitNumber == summary.Id)
+                .OrderBy(p => p.Number)
+                .ToList();
 
             var summaryDto = new JudgementSummaryViewModel
             {
@@ -759,7 +766,8 @@ namespace Legalpedia.Summaries
                 StatusCited = summary.StatusCited,
                 SuitNo = summary.Id,
                 SummaryOfFacts = summary.SummaryOfFacts,
-                Title = summary.Title
+                Title = summary.Title,
+                Pages = pages,
             };
 
             return summaryDto;
