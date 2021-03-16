@@ -8,14 +8,11 @@ namespace Legalpedia.Teams.Dto
     [AutoMapTo(typeof(TeamMember))]
     public class CreateTeamMemberDto
     {
-        public CreateTeamMemberDto()
-        {
-            Uuid = Guid.NewGuid().ToString();
-        }
-        public string Uuid { get; set; }
         [Required]
-        public string TeamUuid { get; set; }
+        public string TeamId { get; set; }
         [Required]
         public long UserId { get; set; }
+        
+        public TeamRole Role { get; set; }
     }
 }
