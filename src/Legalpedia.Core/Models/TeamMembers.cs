@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Legalpedia.Models
 {
     [Table("TeamMembers")]
-    public class TeamMember : Entity
+    public class TeamMember : Entity<string>
     {
         [ForeignKey("Team")]
         public string TeamId { get; set; }

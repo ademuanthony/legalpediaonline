@@ -3,15 +3,17 @@ using System;
 using Legalpedia.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Legalpedia.Migrations
 {
     [DbContext(typeof(LegalpediaDbContext))]
-    partial class LegalpediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210316193803_TeamMember")]
+    partial class TeamMember
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1736,25 +1738,6 @@ namespace Legalpedia.Migrations
                     b.ToTable("dictionary");
                 });
 
-            modelBuilder.Entity("Legalpedia.Models.FavouriteNote", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("NoteId")
-                        .HasColumnType("text");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FavouriteNotes");
-                });
-
             modelBuilder.Entity("Legalpedia.Models.ForeignLegalResource", b =>
                 {
                     b.Property<int>("Id")
@@ -2401,65 +2384,6 @@ namespace Legalpedia.Migrations
                     b.ToTable("maxims");
                 });
 
-            modelBuilder.Entity("Legalpedia.Models.Note", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<int>("AccessType")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Body")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<long>("CreatorId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Labels")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Summary")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TeamId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Notes");
-                });
-
-            modelBuilder.Entity("Legalpedia.Models.NoteComment", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Body")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<long>("CreatorId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("NoteId")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NoteComments");
-                });
-
             modelBuilder.Entity("Legalpedia.Models.OneTimePassword", b =>
                 {
                     b.Property<int>("Id")
@@ -2752,25 +2676,6 @@ namespace Legalpedia.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SearchHistories");
-                });
-
-            modelBuilder.Entity("Legalpedia.Models.SharedNote", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("NoteId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SharedNotes");
                 });
 
             modelBuilder.Entity("Legalpedia.Models.SumAreasOfLaw", b =>

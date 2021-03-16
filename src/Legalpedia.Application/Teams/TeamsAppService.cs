@@ -29,11 +29,11 @@ namespace Legalpedia.Teams
         TeamDto, string,
         PagedResultRequestDto, CreateTeamDto, UpdateTeamDto>, ITeamsAppService
     {
-        private readonly IRepository<TeamMember> _teamMemberRepository;
+        private readonly IRepository<TeamMember, string> _teamMemberRepository;
         private readonly UserManager _userManager;
         private readonly IWebHostEnvironment _hostingEnvironment;
         public TeamsAppService(IRepository<Team, string> repository,
-            IRepository<TeamMember> teamMemberRepository, UserManager userManager,
+            IRepository<TeamMember, string> teamMemberRepository, UserManager userManager,
             IWebHostEnvironment hostingEnvironment) : base(repository)
         {
             _teamMemberRepository = teamMemberRepository;
@@ -127,22 +127,18 @@ namespace Legalpedia.Teams
         {
             var teamMembers = _teamMemberRepository.GetAllIncluding(itm => itm.User)
                 .Where(a => a.TeamId == input.TeamUuid).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
-            var users = new List<UserDto>();
-            foreach (var item in teamMembers)
-            {
-                users.Add(ObjectMapper.Map<UserDto>(item.User));
-            }
+            var users = teamMembers.Select(item => ObjectMapper.Map<UserDto>(item.User)).ToList();
             var totalCount = teamMembers.Count();
             return new PagedResultDto<UserDto>(totalCount, users);
         }
 
         public async Task<TeamMemberDto> AddTeamMember(CreateTeamMemberDto input)
         {
-            var team = Repository.FirstOrDefault(t => t.Id == input.TeamId);
+            var team = await Repository.FirstOrDefaultAsync(t => t.Id == input.TeamId);
             if (team.CreatorId != AbpSession.UserId.Value)
             {
-                var currentMember = _teamMemberRepository.FirstOrDefault(tm => tm.UserId == AbpSession.UserId.Value
-                                                                               && tm.TeamId == input.TeamId && tm.Role == TeamRole.Admin);
+                var currentMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.UserId == AbpSession.UserId.Value
+                    && tm.TeamId == input.TeamId && tm.Role == TeamRole.Admin);
                 if (currentMember == null)
                 {
                     throw new UserFriendlyException(
@@ -160,13 +156,25 @@ namespace Legalpedia.Teams
             return dto;
         }
 
+        public async Task ChangeRole(ChangeRoleInput input)
+        {
+            var teamMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.Id == input.TeamMemberId);
+            if ((await Repository.CountAsync(t => t.Id == teamMember.TeamId 
+                                                  && t.CreatorId == AbpSession.UserId.Value)) == 0)
+            {
+                throw new UserFriendlyException("You are not the creator of this team");
+            }
+            teamMember.Role = input.Role;
+            await _teamMemberRepository.UpdateAsync(teamMember);
+        }
+
         public async Task<TeamMemberDto> RemoveTeamMember(UpdateTeamMemberDto input)
         {
-            var team = Repository.FirstOrDefault(t => t.Id == input.TeamId);
+            var team = await Repository.FirstOrDefaultAsync(t => t.Id == input.TeamId);
             if (team.CreatorId != AbpSession.UserId.Value)
             {
-                var currentMember = _teamMemberRepository.FirstOrDefault(tm => tm.UserId == AbpSession.UserId.Value
-                                                                               && tm.TeamId == input.TeamId && tm.Role == TeamRole.Admin);
+                var currentMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.UserId == AbpSession.UserId.Value
+                    && tm.TeamId == input.TeamId && tm.Role == TeamRole.Admin);
                 if (currentMember == null)
                 {
                     throw new UserFriendlyException(
