@@ -26,6 +26,7 @@ namespace Legalpedia.EntityFrameworkCore
         public DbSet<Dictionary> Dictonaries { get; set; }
         public DbSet<ForeignLegalResource> ForeignLegalResources { get; set; }
         public DbSet<FormsPrecedence> FormsPrecedences { get; set; }
+        public DbSet<Highlight> Highlights { get; set; }
         public DbSet<HoldenAt> HoldenAts { get; set; }
         public DbSet<Index> Indices { get; set; }
         public DbSet<Judgement> Judgements { get; set; }

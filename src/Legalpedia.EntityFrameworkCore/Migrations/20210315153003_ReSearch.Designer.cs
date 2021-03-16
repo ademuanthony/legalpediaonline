@@ -3,15 +3,17 @@ using System;
 using Legalpedia.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Legalpedia.Migrations
 {
     [DbContext(typeof(LegalpediaDbContext))]
-    partial class LegalpediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210315153003_ReSearch")]
+    partial class ReSearch
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1834,50 +1836,6 @@ namespace Legalpedia.Migrations
                     b.ToTable("HoldenAt");
                 });
 
-            modelBuilder.Entity("Legalpedia.Models.Index", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("rowid")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<string>("Court")
-                        .HasColumnType("text")
-                        .HasColumnName("court");
-
-                    b.Property<string>("Header")
-                        .HasColumnType("text")
-                        .HasColumnName("header");
-
-                    b.Property<string>("JudgeDate")
-                        .HasColumnType("text")
-                        .HasColumnName("judgedate");
-
-                    b.Property<string>("Subbody")
-                        .HasColumnType("text")
-                        .HasColumnName("subbody");
-
-                    b.Property<string>("SuitNo")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text")
-                        .HasColumnName("title");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
-
-                    b.Property<string>("Uuid")
-                        .HasColumnType("text")
-                        .HasColumnName("uuid");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("indexes");
-                });
-
             modelBuilder.Entity("Legalpedia.Models.Judgement", b =>
                 {
                     b.Property<string>("Id")
@@ -2072,94 +2030,6 @@ namespace Legalpedia.Migrations
                     b.HasIndex("PartyBTypeId");
 
                     b.ToTable("JudgementsSummaries");
-                });
-
-            modelBuilder.Entity("Legalpedia.Models.Keyword", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<DateTime>("LastIndexingDate")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("last_indexing_date");
-
-                    b.Property<int>("RatioCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("ratio_count");
-
-                    b.Property<int>("ResultCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("result_count");
-
-                    b.Property<int>("SummaryCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("summary_count");
-
-                    b.Property<string>("Text")
-                        .HasColumnType("text")
-                        .HasColumnName("text");
-
-                    b.Property<DateTime>("Version")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("version");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("keywords");
-                });
-
-            modelBuilder.Entity("Legalpedia.Models.KeywordRanking", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<string>("Court")
-                        .HasColumnType("text")
-                        .HasColumnName("court");
-
-                    b.Property<string>("Header")
-                        .HasColumnType("text")
-                        .HasColumnName("header");
-
-                    b.Property<long>("IndexId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("index_id");
-
-                    b.Property<string>("JudgeDate")
-                        .HasColumnType("text")
-                        .HasColumnName("judgedate");
-
-                    b.Property<long>("KeywordId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("keyword_id");
-
-                    b.Property<long>("Rank")
-                        .HasColumnType("bigint")
-                        .HasColumnName("rank");
-
-                    b.Property<string>("Subbody")
-                        .HasColumnType("text")
-                        .HasColumnName("subbody");
-
-                    b.Property<string>("SuitNo")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text")
-                        .HasColumnName("title");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("keyword_rankings");
                 });
 
             modelBuilder.Entity("Legalpedia.Models.LawOfFedPart", b =>
@@ -2651,8 +2521,10 @@ namespace Legalpedia.Migrations
 
             modelBuilder.Entity("Legalpedia.Models.SearchHistory", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp without time zone");

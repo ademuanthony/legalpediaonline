@@ -15,4 +15,7 @@
     <ProjectReference Include="..\Legalpedia.EntityFrameworkCore\Legalpedia.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\Legalpedia.Shared\Legalpedia.Shared.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CsQuery.NETStandard" Version="1.3.6.1" />
+  </ItemGroup>
 </Project>
