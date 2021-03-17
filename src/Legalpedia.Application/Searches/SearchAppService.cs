@@ -82,7 +82,7 @@ namespace Legalpedia.Searches
 
                 var currentUser = new UserDto {Id = 1}; // await GetCurrentUserAsync();
 
-                // var history =
+                // var history = 
                 //     _searchHistoryRepository.FirstOrDefault(s =>
                 //         s.SearchWord == term && s.CreatorUserId == currentUser.Id);
                 // if (history != null)
