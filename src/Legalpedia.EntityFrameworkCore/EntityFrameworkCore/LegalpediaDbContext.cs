@@ -20,6 +20,7 @@ namespace Legalpedia.EntityFrameworkCore
         public DbSet<FavouriteNote> FavouriteNotes { get; set; }
         public DbSet<NoteComment> NoteComments { get; set; }
         public DbSet<SharedNote> SharedNotes { get; set; }
+        public DbSet<NoteRating> NoteRatings { get; set; }
         
         public DbSet<AreaOfLaw> AreaOfLaws { get; set; }
         public DbSet<Article> Articles { get; set; }

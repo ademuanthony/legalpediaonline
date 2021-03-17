@@ -42,7 +42,16 @@ namespace Legalpedia.Models
     public class SharedNote: Entity<string>
     {
         public string NoteId { get; set; }
-        public string UserId { get; set; }
+        public long UserId { get; set; }
+        
+        public long? TargetUserId { get; set; }
         public DateTime CreatedAt { get; set; }
+    }
+
+    public class NoteRating:Entity<string>
+    {
+        public string NoteId { get; set; }
+        public long UserId { get; set; }
+        public int Rating { get; set; }
     }
 }
