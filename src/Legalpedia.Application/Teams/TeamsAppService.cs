@@ -60,10 +60,6 @@ namespace Legalpedia.Teams
                 Directory.CreateDirectory(uploads);
             }
             var filePath = Path.Combine(uploads, uniqueFileName);
-            /* using (var stream = new FileStream(filePath, FileMode.Create))
-             {
-                 input.TeamLogo.CopyTo(stream);
-             }*/
             try
             {
                 byte[] bytes = Convert.FromBase64String(input.Logo);
