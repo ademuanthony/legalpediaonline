@@ -86,6 +86,7 @@ namespace Legalpedia.EntityFrameworkCore
             modelBuilder.Entity<ApplicationLanguageText>()
                 .Property(p => p.Value)
                 .HasMaxLength(100); // any integer that is smaller than 10485760
+            modelBuilder.Entity<Package>().Property(ent => ent.Id).ValueGeneratedOnAdd();
         }
 
         public override int SaveChanges()

@@ -20,3 +20,7 @@ COPY --from=build-env /app/Legalpedia.Web.Host/bin/Release/net5.0 .
 # e.g. MyProject.dll
 # ENTRYPOINT [ "dotnet", "Legalpedia.Web.Host.dll" ]
 CMD ASPNETCORE_URLS=http://*:$PORT dotnet Legalpedia.Web.Host.dll
+
+# sudo docker build -t legalpedia-api .
+# sudo heroku container:push -a legalpedia-api web
+# sudo heroku container:release -a legalpedia-api web
