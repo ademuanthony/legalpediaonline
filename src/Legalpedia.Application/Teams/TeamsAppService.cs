@@ -152,7 +152,7 @@ namespace Legalpedia.Teams
             return dto;
         }
 
-        public async Task ChangeRole(ChangeRoleInput input)
+        public async Task<bool> ChangeRole(ChangeRoleInput input)
         {
             var teamMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.Id == input.TeamMemberId);
             if ((await Repository.CountAsync(t => t.Id == teamMember.TeamId 
@@ -162,6 +162,7 @@ namespace Legalpedia.Teams
             }
             teamMember.Role = input.Role;
             await _teamMemberRepository.UpdateAsync(teamMember);
+            return true;
         }
 
         public async Task<TeamMemberDto> RemoveTeamMember(UpdateTeamMemberDto input)

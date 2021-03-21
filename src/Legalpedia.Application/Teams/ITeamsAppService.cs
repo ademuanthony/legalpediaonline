@@ -13,7 +13,7 @@ namespace Legalpedia.Teams
         Task<PagedResultDto<TeamDto>> Filter(FilterTeamDto input);
         Task<PagedResultDto<UserDto>> GetTeamMembers(FetchTeamDto input);
         Task<TeamMemberDto> AddTeamMember(CreateTeamMemberDto input);
-        Task ChangeRole(ChangeRoleInput input);
+        Task<bool> ChangeRole(ChangeRoleInput input);
         Task<TeamMemberDto> RemoveTeamMember(UpdateTeamMemberDto input);
 
     }
