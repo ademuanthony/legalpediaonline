@@ -30,15 +30,17 @@ namespace Legalpedia.Teams
         PagedResultRequestDto, CreateTeamDto, UpdateTeamDto>, ITeamsAppService
     {
         private readonly IRepository<TeamMember, string> _teamMemberRepository;
+        private readonly IRepository<User, long> _userRepository;
         private readonly UserManager _userManager;
         private readonly IWebHostEnvironment _hostingEnvironment;
         public TeamsAppService(IRepository<Team, string> repository,
             IRepository<TeamMember, string> teamMemberRepository, UserManager userManager,
-            IWebHostEnvironment hostingEnvironment) : base(repository)
+            IWebHostEnvironment hostingEnvironment, IRepository<User, long> userRepository) : base(repository)
         {
             _teamMemberRepository = teamMemberRepository;
             _userManager = userManager;
             _hostingEnvironment = hostingEnvironment;
+            _userRepository = userRepository;
         }
 
         public override Task<TeamDto> CreateAsync(CreateTeamDto input)
@@ -119,37 +121,57 @@ namespace Legalpedia.Teams
             return new PagedResultDto<TeamDto>(totalCount, teams);
         }
 
-        public async Task<PagedResultDto<UserDto>> GetTeamMembers(FetchTeamDto input)
+        public async Task<PagedResultDto<TeamMemberInfo>> GetTeamMembers(FetchTeamDto input)
         {
-            var teamMembers = _teamMemberRepository.GetAllIncluding(itm => itm.User)
-                .Where(a => a.TeamId == input.TeamUuid).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
-            var users = teamMembers.Select(item => ObjectMapper.Map<UserDto>(item.User)).ToList();
-            var totalCount = teamMembers.Count();
-            return new PagedResultDto<UserDto>(totalCount, users);
+            var query = (from tm in _teamMemberRepository.GetAll()
+                join u in _userRepository.GetAll() on tm.UserId equals u.Id
+                orderby tm.Id
+                where tm.TeamId == input.TeamId
+                select new TeamMemberInfo
+                {
+                    Role = tm.Role, 
+                    Username = u.UserName, 
+                    DisplayName = u.FullName, 
+                    UserId = u.Id
+                });
+
+            var totalCount = query.Count();
+            var members = query.Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
+            
+            return new PagedResultDto<TeamMemberInfo>(totalCount, members);
         }
 
         public async Task<TeamMemberDto> AddTeamMember(CreateTeamMemberDto input)
         {
-            var team = await Repository.FirstOrDefaultAsync(t => t.Id == input.TeamId);
-            if (team.CreatorId != AbpSession.UserId.Value)
+            try
             {
-                var currentMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.UserId == AbpSession.UserId.Value
-                    && tm.TeamId == input.TeamId && tm.Role == TeamRole.Admin);
-                if (currentMember == null)
+                var team = await Repository.FirstOrDefaultAsync(t => t.Id == input.TeamId);
+                if (team.CreatorId != AbpSession.UserId.Value)
                 {
-                    throw new UserFriendlyException(
-                        "Access Denied; you are neither the owner nor an admin of this team");
+                    var currentMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.UserId == AbpSession.UserId.Value
+                        && tm.TeamId == input.TeamId && tm.Role == TeamRole.Admin);
+                    if (currentMember == null)
+                    {
+                        throw new UserFriendlyException(
+                            "Access Denied; you are neither the owner nor an admin of this team");
+                    }
                 }
+                var existingRecord = _teamMemberRepository.GetAll().FirstOrDefault(a => a.UserId == input.UserId && a.TeamId == input.TeamId);
+                if (existingRecord != null)
+                {
+                    throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The member is already in this team.");
+                }
+
+                var tm = ObjectMapper.Map<TeamMember>(input);
+                tm.Id = Guid.NewGuid().ToString();
+                var teamMember = await _teamMemberRepository.InsertAsync(tm);
+                return ObjectMapper.Map<TeamMemberDto>(teamMember);
             }
-            var existingRecord = _teamMemberRepository.GetAll().FirstOrDefault(a => a.UserId == input.UserId && a.TeamId == input.TeamId);
-            if (existingRecord != null)
+            catch (Exception e)
             {
-                throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The member is already in this team.");
+                Console.WriteLine(e);
+                throw;
             }
-            var teamMember = await _teamMemberRepository.InsertAsync(ObjectMapper.Map<TeamMember>(input));
-            await CurrentUnitOfWork.SaveChangesAsync();
-            var dto = ObjectMapper.Map<TeamMemberDto>(teamMember);
-            return dto;
         }
 
         public async Task<bool> ChangeRole(ChangeRoleInput input)

@@ -24,6 +24,7 @@ namespace Legalpedia.Models
     public enum TeamRole
     {
         Member,
-        Admin
+        Admin,
+        Owner
     }
 }

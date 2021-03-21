@@ -9,6 +9,6 @@ namespace Legalpedia.Teams.Dto
     public class FetchTeamDto : PagedResultRequestDto
     {
         [Required]
-        public string TeamUuid { get; set; }
+        public string TeamId { get; set; }
     }
 }
