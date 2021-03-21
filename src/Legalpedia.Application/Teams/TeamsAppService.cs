@@ -14,12 +14,12 @@ using Legalpedia.Teams.Dto;
 using System.Net;
 using Legalpedia.Users.Dto;
 using Legalpedia.Authorization.Users;
-using Microsoft.AspNetCore.Hosting;
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Abp.Extensions;
 using Abp.Threading.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,16 +32,14 @@ namespace Legalpedia.Teams
     {
         private readonly IRepository<TeamMember, string> _teamMemberRepository;
         private readonly IRepository<User, long> _userRepository;
-        private readonly UserManager _userManager;
-        private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IRepository<TeamLogo, string> _teamLogoRepository;
         public TeamsAppService(IRepository<Team, string> repository,
-            IRepository<TeamMember, string> teamMemberRepository, UserManager userManager,
-            IWebHostEnvironment hostingEnvironment, IRepository<User, long> userRepository) : base(repository)
+            IRepository<TeamMember, string> teamMemberRepository, IRepository<User, long> userRepository,
+            IRepository<TeamLogo, string> teamLogoRepository) : base(repository)
         {
             _teamMemberRepository = teamMemberRepository;
-            _userManager = userManager;
-            _hostingEnvironment = hostingEnvironment;
             _userRepository = userRepository;
+            _teamLogoRepository = teamLogoRepository;
         }
 
         public override Task<TeamDto> CreateAsync(CreateTeamDto input)
@@ -50,37 +48,62 @@ namespace Legalpedia.Teams
             {
                 throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team logo is required.");
             }
-
-            var team = Repository.GetAll().FirstOrDefault(a => a.Name.ToLower().Contains(input.Name.ToLower()));
-            if (team != null)
+            if (Repository.Count(t=>t.Name.ToLower() == input.Name.ToLower()) > 0)
             {
                 throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team name '{input.Name}' already exists.");
             }
-            var uniqueFileName = string.Format("{0}{1}", Guid.NewGuid().ToString("N"), ".png");
-            var uploads = Path.Combine(_hostingEnvironment.WebRootPath, LegalpediaConsts.TeamsLogoFolder);
-            if(!Directory.Exists(uploads))
-            {
-                Directory.CreateDirectory(uploads);
-            }
-            var filePath = Path.Combine(uploads, uniqueFileName);
+
+            var teamId = Guid.NewGuid().ToString();
             try
             {
-                byte[] bytes = Convert.FromBase64String(input.Logo);
-                using (MemoryStream ms = new MemoryStream(bytes))
+                // validate input
+                Convert.FromBase64String(input.Logo);
+                _teamLogoRepository.Insert(new TeamLogo
                 {
-                    using (Image image = Image.FromStream(ms))
-                    {
-                        image.Save(filePath, ImageFormat.Png);
-                    }
-                }
+                    Id = Guid.NewGuid().ToString(),
+                    TeamId = teamId,
+                    Base64 = input.Logo
+                });
             }
             catch(Exception ex)
             {
                 throw new UserFriendlyException((int)HttpStatusCode.InternalServerError, ex.Message);
             }
-            input.Logo = uniqueFileName;
             input.CreatorId = AbpSession.UserId.Value;
+            input.Id = teamId;
+            
             return base.CreateAsync(input);
+        }
+
+        public override async Task<TeamDto> UpdateAsync(UpdateTeamDto input)
+        {
+            if (input.Logo.IsNullOrEmpty()) return await base.UpdateAsync(input);
+
+            try
+            {
+                Convert.FromBase64String(input.Logo);
+                var logo = await _teamLogoRepository.FirstOrDefaultAsync(tl => tl.TeamId == input.Id);
+                if (logo == null)
+                {
+                    await _teamLogoRepository.InsertAsync(new TeamLogo
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        TeamId = input.Id,
+                        Base64 = input.Logo
+                    });
+                }
+                else
+                {
+                    logo.Base64 = input.Logo;
+                    await _teamLogoRepository.UpdateAsync(logo);
+                }
+                return await base.UpdateAsync(input);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<PagedResultDto<TeamDto>> Filter(FilterTeamDto input)
@@ -96,12 +119,21 @@ namespace Legalpedia.Teams
                 CreatorId = art.CreatorId,
                 Name = art.Name,
                 Description = art.Description,
-                Logo = art.Logo,
             }).OrderBy(art => art.Id).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
             var totalCount = teamsQuery.Count();
             return new PagedResultDto<TeamDto>(totalCount, teams);
         }
 
+        public async Task<string> TeamLogo(EntityDto<string> entityDto)
+        {
+            var logo = await _teamLogoRepository.FirstOrDefaultAsync(tl => tl.TeamId == entityDto.Id);
+            if (logo == null)
+            {
+                throw new UserFriendlyException("Logo not found");
+            }
+
+            return logo.Base64;
+        }
         public async Task<PagedResultDto<TeamDto>> MyTeams(PagedResultRequestDto input)
         {
             var query = from t in Repository.GetAll()
@@ -116,7 +148,6 @@ namespace Legalpedia.Teams
             {
                 Name = art.Name,
                 Description = art.Description,
-                Logo = art.Logo,
                 CreatorId = art.CreatorId
             }).ToList();
             return new PagedResultDto<TeamDto>(totalCount, teams);
@@ -136,7 +167,7 @@ namespace Legalpedia.Teams
                     UserId = u.Id
                 });
 
-            var totalCount = query.Count();
+            var totalCount = await query.CountAsync();
             var members = query.Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
             
             return new PagedResultDto<TeamMemberInfo>(totalCount, members);
