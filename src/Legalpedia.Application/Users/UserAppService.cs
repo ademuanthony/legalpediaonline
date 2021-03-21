@@ -18,6 +18,7 @@ using Legalpedia.Authorization;
 using Legalpedia.Authorization.Accounts;
 using Legalpedia.Authorization.Roles;
 using Legalpedia.Authorization.Users;
+using Legalpedia.Packages.Dto;
 using Legalpedia.Roles.Dto;
 using Legalpedia.Users.Dto;
 using Microsoft.AspNetCore.Identity;
@@ -97,6 +98,18 @@ namespace Legalpedia.Users
             return await GetAsync(input);
         }
 
+        public async Task<UserDto> UpdateBio(UpdateBioInput input)
+        {
+            if (AbpSession.UserId == null)
+            {
+                throw new UserFriendlyException("Please login to update your profile");
+            }
+            var user = await _userManager.GetUserByIdAsync(AbpSession.UserId.Value);
+            user.Bio = input.Bio;
+            CheckErrors(await _userManager.UpdateAsync(user));
+            return ObjectMapper.Map<UserDto>(user);
+        }
+        
         public async Task<bool> ChangeLogo(ChangeLogoInput input)
         {
             try 

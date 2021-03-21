@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Legalpedia.Authorization.Users;
+using Legalpedia.Packages.Dto;
 using Legalpedia.Roles.Dto;
 using Legalpedia.Users.Dto;
 
@@ -18,5 +19,6 @@ namespace Legalpedia.Users
         Task<bool> ChangeLogo(ChangeLogoInput input);
         Task<UserPicture> MyProfilePicture();
         Task<UserPicture> ProfilePicture(long userId);
+        Task<UserDto> UpdateBio(UpdateBioInput input);
     }
 }
