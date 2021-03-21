@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace Legalpedia.Users
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IAbpSession _abpSession;
         private readonly LogInManager _logInManager;
+        private readonly IRepository<UserPicture, string> _pictureRepository;
 
         public UserAppService(
             IRepository<User, long> repository,
@@ -41,7 +43,8 @@ namespace Legalpedia.Users
             IRepository<Role> roleRepository,
             IPasswordHasher<User> passwordHasher,
             IAbpSession abpSession,
-            LogInManager logInManager)
+            LogInManager logInManager, 
+            IRepository<UserPicture, string> pictureRepository)
             : base(repository)
         {
             _userManager = userManager;
@@ -50,6 +53,7 @@ namespace Legalpedia.Users
             _passwordHasher = passwordHasher;
             _abpSession = abpSession;
             _logInManager = logInManager;
+            _pictureRepository = pictureRepository;
         }
 
         public override async Task<UserDto> CreateAsync(CreateUserDto input)
@@ -93,6 +97,50 @@ namespace Legalpedia.Users
             return await GetAsync(input);
         }
 
+        public async Task<bool> ChangeLogo(ChangeLogoInput input)
+        {
+            try 
+            {
+                // validate input
+                Convert.FromBase64String(input.Base64);
+                var picture = await _pictureRepository.FirstOrDefaultAsync(p => p.UserId == _abpSession.UserId.Value);
+                if (picture == null)
+                {
+                    await _pictureRepository.InsertAsync(new UserPicture
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        UserId = AbpSession.UserId.Value,
+                        Base64 = input.Base64
+                    });
+                    return true;
+                }
+
+                picture.Base64 = input.Base64;
+                await _pictureRepository.UpdateAsync(picture);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public async Task<UserPicture> ProfilePicture()
+        {
+            return await ProfilePicture(AbpSession.UserId.Value);
+        }
+        public async Task<UserPicture> ProfilePicture(long userId)
+        {
+            var picture = await _pictureRepository.FirstOrDefaultAsync(p => p.UserId == userId);
+            if (picture == null)
+            {
+                throw new UserFriendlyException("Picture not found");
+            }
+
+            return picture;
+        }
+        
         public override async Task DeleteAsync(EntityDto<long> input)
         {
             var user = await _userManager.GetUserByIdAsync(input.Id);

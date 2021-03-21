@@ -7,6 +7,8 @@ namespace Legalpedia.Authorization.Users
 {
     public class User : AbpUser<User>
     {
+        public string Bio { get; set; }
+        
         public const string DefaultPassword = "123qwe";
 
         public static string CreateRandomPassword()

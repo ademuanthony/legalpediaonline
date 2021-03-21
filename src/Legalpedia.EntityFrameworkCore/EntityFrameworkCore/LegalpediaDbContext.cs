@@ -70,6 +70,7 @@ namespace Legalpedia.EntityFrameworkCore
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Update> Updates { get; set; }
         public DbSet<UpdateMeta> UpdateMetas { get; set; }
+        public DbSet<UserPicture> UserPictures { get; set; }
 
 
         public LegalpediaDbContext(DbContextOptions<LegalpediaDbContext> options)
