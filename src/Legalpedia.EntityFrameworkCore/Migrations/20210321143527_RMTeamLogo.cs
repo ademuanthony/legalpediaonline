@@ -9,16 +9,16 @@ namespace Legalpedia.Migrations
             migrationBuilder.DropColumn(
                 name: "Logo",
                 table: "Teams");
-
-            migrationBuilder.AlterColumn<long>(
+            
+            migrationBuilder.DropColumn(
+                name: "UserId",
+                table: "SharedNotes");
+            
+            migrationBuilder.AddColumn<long>(
                 name: "UserId",
                 table: "SharedNotes",
                 type: "bigint",
-                nullable: false,
-                defaultValue: 0L,
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
+                nullable: true);
 
             migrationBuilder.AddColumn<long>(
                 name: "TargetUserId",
@@ -55,14 +55,16 @@ namespace Legalpedia.Migrations
                 table: "Teams",
                 type: "text",
                 nullable: true);
-
-            migrationBuilder.AlterColumn<string>(
+            
+            migrationBuilder.DropColumn(
+                name: "UserId",
+                table: "SharedNotes");
+            
+            migrationBuilder.AddColumn<long>(
                 name: "UserId",
                 table: "SharedNotes",
                 type: "text",
-                nullable: true,
-                oldClrType: typeof(long),
-                oldType: "bigint");
+                nullable: true);
         }
     }
 }
