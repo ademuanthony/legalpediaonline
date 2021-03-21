@@ -16,7 +16,7 @@ namespace Legalpedia.Users
 
         Task<bool> ChangePassword(ChangePasswordDto input);
         Task<bool> ChangeLogo(ChangeLogoInput input);
-        Task<UserPicture> ProfilePicture();
+        Task<UserPicture> MyProfilePicture();
         Task<UserPicture> ProfilePicture(long userId);
     }
 }

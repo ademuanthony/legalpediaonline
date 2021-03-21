@@ -126,7 +126,7 @@ namespace Legalpedia.Users
             }
         }
 
-        public async Task<UserPicture> ProfilePicture()
+        public async Task<UserPicture> MyProfilePicture()
         {
             return await ProfilePicture(AbpSession.UserId.Value);
         }
