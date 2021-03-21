@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Drawing;
 using System.Drawing.Imaging;
 using Abp.Threading.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Legalpedia.Teams
 {
@@ -108,7 +109,7 @@ namespace Legalpedia.Teams
                 where tm.UserId == AbpSession.UserId.Value
                 select t;
 
-            var totalCount = query.Count();
+            var totalCount = await query.CountAsync();
             var teams = query.OrderBy(t => t.Id)
                 .Skip(input.SkipCount).Take(input.MaxResultCount)
                 .Select(art =>new TeamDto
