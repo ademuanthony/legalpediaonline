@@ -6,13 +6,15 @@ using Legalpedia.Users.Dto;
 
 namespace Legalpedia.Teams
 {
-    public interface ITeamsAppService : IAsyncCrudAppService<TeamDto, int,
+    public interface ITeamsAppService : IAsyncCrudAppService<TeamDto, string,
         PagedResultRequestDto, CreateTeamDto, UpdateTeamDto>
     {
+        Task<PagedResultDto<TeamDto>> MyTeams(PagedResultRequestDto input);
         Task<PagedResultDto<TeamDto>> Filter(FilterTeamDto input);
-        TeamDto GetByUuid(EntityDto<string> input);
-        Task<PagedResultDto<UserDto>> GetTeamMembers(FetchTeamDto input);
+        Task<string> TeamLogo(EntityDto<string> entityDto);
+        Task<PagedResultDto<TeamMemberInfo>> GetTeamMembers(FetchTeamDto input);
         Task<TeamMemberDto> AddTeamMember(CreateTeamMemberDto input);
+        Task<bool> ChangeRole(ChangeRoleInput input);
         Task<TeamMemberDto> RemoveTeamMember(UpdateTeamMemberDto input);
 
     }

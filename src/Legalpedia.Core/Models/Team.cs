@@ -6,20 +6,10 @@ using Abp.Domain.Entities;
 namespace Legalpedia.Models
 {
     [Table("Teams")]
-    public class Team : Entity
+    public class Team : Entity<string>
     {
-        public Team()
-        {
-            Uuid = Guid.NewGuid().ToString();
-        }
-        [Key]
-        [Column("uuid")]
-        public string Uuid { get; set; }
-        [Column("name")]
+        public long CreatorId { get; set; }
         public string Name { get; set; }
-        [Column("description")]
         public string Description { get; set; }
-        [Column("logo")]
-        public string Logo { get; set; }
     }
 }

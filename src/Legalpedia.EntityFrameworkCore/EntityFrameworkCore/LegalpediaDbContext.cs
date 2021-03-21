@@ -15,6 +15,13 @@ namespace Legalpedia.EntityFrameworkCore
         /* Define a DbSet for each entity of the application */
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamMember> TeamMembers { get; set; }
+        
+        public DbSet<Note> Notes { get; set; }
+        public DbSet<FavouriteNote> FavouriteNotes { get; set; }
+        public DbSet<NoteComment> NoteComments { get; set; }
+        public DbSet<SharedNote> SharedNotes { get; set; }
+        public DbSet<NoteRating> NoteRatings { get; set; }
+        
         public DbSet<AreaOfLaw> AreaOfLaws { get; set; }
         public DbSet<Article> Articles { get; set; }
         public DbSet<Bookmark> Bookmarks { get; set; }
@@ -79,6 +86,7 @@ namespace Legalpedia.EntityFrameworkCore
             modelBuilder.Entity<ApplicationLanguageText>()
                 .Property(p => p.Value)
                 .HasMaxLength(100); // any integer that is smaller than 10485760
+            modelBuilder.Entity<Package>().Property(ent => ent.Id).ValueGeneratedOnAdd();
         }
 
         public override int SaveChanges()

@@ -7,25 +7,24 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Legalpedia.Models
 {
     [Table("TeamMembers")]
-    public class TeamMember : Entity
+    public class TeamMember : Entity<string>
     {
-        public TeamMember()
-        {
-            Uuid = Guid.NewGuid().ToString();
-        }
-        [Key]
-        [Column("uuid")]
-        public string Uuid { get; set; }
-        [Column("teamuuid")]
         [ForeignKey("Team")]
-        public string TeamUuid { get; set; }
-        [Column("userid")]
+        public string TeamId { get; set; }
+        
         [ForeignKey("User")]
         public long UserId { get; set; }
+        
+        public TeamRole Role { get; set; }
 
         public Team Team { get; set; }
         public User User { get; set; }
+    }
 
-
+    public enum TeamRole
+    {
+        Member,
+        Admin,
+        Owner
     }
 }

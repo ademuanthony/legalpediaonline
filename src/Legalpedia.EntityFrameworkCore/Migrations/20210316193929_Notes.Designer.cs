@@ -3,15 +3,17 @@ using System;
 using Legalpedia.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Legalpedia.Migrations
 {
     [DbContext(typeof(LegalpediaDbContext))]
-    partial class LegalpediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210316193929_Notes")]
+    partial class Notes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2460,25 +2462,6 @@ namespace Legalpedia.Migrations
                     b.ToTable("NoteComments");
                 });
 
-            modelBuilder.Entity("Legalpedia.Models.NoteRating", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("NoteId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NoteRatings");
-                });
-
             modelBuilder.Entity("Legalpedia.Models.OneTimePassword", b =>
                 {
                     b.Property<int>("Id")
@@ -2784,11 +2767,8 @@ namespace Legalpedia.Migrations
                     b.Property<string>("NoteId")
                         .HasColumnType("text");
 
-                    b.Property<long?>("TargetUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -2885,6 +2865,9 @@ namespace Legalpedia.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Logo")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")

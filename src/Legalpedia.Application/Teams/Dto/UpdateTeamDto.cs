@@ -5,10 +5,8 @@ using Legalpedia.Models;
 namespace Legalpedia.Teams.Dto
 {
     [AutoMapTo(typeof(Team))]
-    public class UpdateTeamDto:EntityDto
+    public class UpdateTeamDto:EntityDto<string>
     {
-        public string Uuid { get; set; }
-
         public string Name { get; set; }
         public string Description { get; set; }
         public string Logo { get; set; }

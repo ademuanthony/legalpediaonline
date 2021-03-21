@@ -2,15 +2,18 @@
 using Legalpedia.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
+using Abp.Application.Services.Dto;
 
 namespace Legalpedia.Teams.Dto
 {
     [AutoMapTo(typeof(TeamMember))]
-    public class UpdateTeamMemberDto
+    public class UpdateTeamMemberDto:EntityDto<string>
     {
         [Required]
-        public string TeamUuid { get; set; }
+        public string TeamId { get; set; }
         [Required]
         public long UserId { get; set; }
+        
+        public TeamRole Role { get; set; }
     }
 }

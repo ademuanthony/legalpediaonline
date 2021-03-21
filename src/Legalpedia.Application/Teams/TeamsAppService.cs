@@ -14,30 +14,32 @@ using Legalpedia.Teams.Dto;
 using System.Net;
 using Legalpedia.Users.Dto;
 using Legalpedia.Authorization.Users;
-using Microsoft.AspNetCore.Hosting;
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Abp.Extensions;
+using Abp.Threading.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Legalpedia.Teams
 {
-   // [AbpAuthorize(PermissionNames.TeamPage)]
+   [AbpAuthorize]
     public class TeamsAppService : AsyncCrudAppService<Team,
-        TeamDto, int,
+        TeamDto, string,
         PagedResultRequestDto, CreateTeamDto, UpdateTeamDto>, ITeamsAppService
     {
-        private readonly IRepository<TeamMember> _teamMembetRepository;
-        private readonly UserManager _userManager;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        public TeamsAppService(IRepository<Team> repository,
-            IRepository<TeamMember> teamMembetRepository, UserManager userManager,
-            IHostingEnvironment hostingEnvironment) : base(repository)
+        private readonly IRepository<TeamMember, string> _teamMemberRepository;
+        private readonly IRepository<User, long> _userRepository;
+        private readonly IRepository<TeamLogo, string> _teamLogoRepository;
+        public TeamsAppService(IRepository<Team, string> repository,
+            IRepository<TeamMember, string> teamMemberRepository, IRepository<User, long> userRepository,
+            IRepository<TeamLogo, string> teamLogoRepository) : base(repository)
         {
-            _teamMembetRepository = teamMembetRepository;
-            _userManager = userManager;
-            _hostingEnvironment = hostingEnvironment;
+            _teamMemberRepository = teamMemberRepository;
+            _userRepository = userRepository;
+            _teamLogoRepository = teamLogoRepository;
         }
 
         public override Task<TeamDto> CreateAsync(CreateTeamDto input)
@@ -46,51 +48,64 @@ namespace Legalpedia.Teams
             {
                 throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team logo is required.");
             }
-
-            var team = Repository.GetAll().FirstOrDefault(a => a.Name.ToLower().Contains(input.Name.ToLower()));
-            if (team != null)
+            if (Repository.Count(t=>t.Name.ToLower() == input.Name.ToLower()) > 0)
             {
                 throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team name '{input.Name}' already exists.");
             }
-            if (Repository.GetAll().Any(a => a.Uuid == input.Uuid))
-            {
-                throw new UserFriendlyException("Team already exists");
-            }
-            var uniqueFileName = string.Format("{0}{1}", Guid.NewGuid().ToString("N"), ".png");
-            var uploads = Path.Combine(_hostingEnvironment.WebRootPath, LegalpediaConsts.TeamsLogoFolder);
-            if(!Directory.Exists(uploads))
-            {
-                Directory.CreateDirectory(uploads);
-            }
-            var filePath = Path.Combine(uploads, uniqueFileName);
-            /* using (var stream = new FileStream(filePath, FileMode.Create))
-             {
-                 input.TeamLogo.CopyTo(stream);
-             }*/
+
+            var teamId = Guid.NewGuid().ToString();
             try
             {
-                byte[] bytes = Convert.FromBase64String(input.Logo);
-                using (MemoryStream ms = new MemoryStream(bytes))
+                // validate input
+                Convert.FromBase64String(input.Logo);
+                _teamLogoRepository.Insert(new TeamLogo
                 {
-                    using (Image image = Image.FromStream(ms))
-                    {
-                        image.Save(filePath, ImageFormat.Png);
-                    }
-                }
+                    Id = Guid.NewGuid().ToString(),
+                    TeamId = teamId,
+                    Base64 = input.Logo
+                });
             }
             catch(Exception ex)
             {
                 throw new UserFriendlyException((int)HttpStatusCode.InternalServerError, ex.Message);
             }
-            input.Logo = uniqueFileName;
+            input.CreatorId = AbpSession.UserId.Value;
+            input.Id = teamId;
+            
             return base.CreateAsync(input);
         }
 
-        public TeamDto GetByUuid(EntityDto<string> input)
+        public override async Task<TeamDto> UpdateAsync(UpdateTeamDto input)
         {
-            var team = Repository.FirstOrDefault(art => art.Uuid == input.Id);
-            return ObjectMapper.Map<TeamDto>(team);
+            if (input.Logo.IsNullOrEmpty()) return await base.UpdateAsync(input);
+
+            try
+            {
+                Convert.FromBase64String(input.Logo);
+                var logo = await _teamLogoRepository.FirstOrDefaultAsync(tl => tl.TeamId == input.Id);
+                if (logo == null)
+                {
+                    await _teamLogoRepository.InsertAsync(new TeamLogo
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        TeamId = input.Id,
+                        Base64 = input.Logo
+                    });
+                }
+                else
+                {
+                    logo.Base64 = input.Logo;
+                    await _teamLogoRepository.UpdateAsync(logo);
+                }
+                return await base.UpdateAsync(input);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
+
         public async Task<PagedResultDto<TeamDto>> Filter(FilterTeamDto input)
         {
             if (string.IsNullOrEmpty(input.Name))
@@ -98,58 +113,133 @@ namespace Legalpedia.Teams
                 var result = await base.GetAllAsync(input);
                 return result;
             }
-            var TeamsQuery = Repository.GetAll().Where(a => a.Name.ToLower().Contains(input.Name.ToLower()));
-            var Teams = TeamsQuery.Select(art => new TeamDto
+            var teamsQuery = Repository.GetAll().Where(a => a.Name.ToLower().Contains(input.Name.ToLower()));
+            var teams = teamsQuery.Select(art => new TeamDto
             {
-                Uuid = art.Uuid,
+                CreatorId = art.CreatorId,
                 Name = art.Name,
                 Description = art.Description,
-                Logo = art.Logo,
             }).OrderBy(art => art.Id).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
-            var totalCount = TeamsQuery.Count();
-            return new PagedResultDto<TeamDto>(totalCount, Teams);
+            var totalCount = teamsQuery.Count();
+            return new PagedResultDto<TeamDto>(totalCount, teams);
         }
 
-        public async Task<PagedResultDto<UserDto>> GetTeamMembers(FetchTeamDto input)
+        public async Task<string> TeamLogo(EntityDto<string> entityDto)
         {
-            var teamMembers = _teamMembetRepository.GetAllIncluding(itm => itm.User)
-                .Where(a => a.TeamUuid == input.TeamUuid).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
-            var users = new List<UserDto>();
-            foreach (var item in teamMembers)
+            var logo = await _teamLogoRepository.FirstOrDefaultAsync(tl => tl.TeamId == entityDto.Id);
+            if (logo == null)
             {
-                users.Add(ObjectMapper.Map<UserDto>(item.User));
+                throw new UserFriendlyException("Logo not found");
             }
-            var totalCount = teamMembers.Count();
-            return new PagedResultDto<UserDto>(totalCount, users);
+
+            return logo.Base64;
+        }
+        public async Task<PagedResultDto<TeamDto>> MyTeams(PagedResultRequestDto input)
+        {
+            var query = from t in Repository.GetAll()
+                join tm in _teamMemberRepository.GetAll() on t.Id equals tm.TeamId
+                where tm.UserId == AbpSession.UserId.Value
+                select t;
+
+            var totalCount = await query.CountAsync();
+            var teams = query.OrderBy(t => t.Id)
+                .Skip(input.SkipCount).Take(input.MaxResultCount)
+                .Select(art =>new TeamDto
+            {
+                Name = art.Name,
+                Description = art.Description,
+                CreatorId = art.CreatorId
+            }).ToList();
+            return new PagedResultDto<TeamDto>(totalCount, teams);
+        }
+
+        public async Task<PagedResultDto<TeamMemberInfo>> GetTeamMembers(FetchTeamDto input)
+        {
+            var query = (from tm in _teamMemberRepository.GetAll()
+                join u in _userRepository.GetAll() on tm.UserId equals u.Id
+                orderby tm.Id
+                where tm.TeamId == input.TeamId
+                select new TeamMemberInfo
+                {
+                    Role = tm.Role, 
+                    Username = u.UserName, 
+                    DisplayName = u.FullName, 
+                    UserId = u.Id
+                });
+
+            var totalCount = await query.CountAsync();
+            var members = query.Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
+            
+            return new PagedResultDto<TeamMemberInfo>(totalCount, members);
         }
 
         public async Task<TeamMemberDto> AddTeamMember(CreateTeamMemberDto input)
         {
-            var team = _teamMembetRepository.GetAll().FirstOrDefault(a => a.UserId == input.UserId && a.TeamUuid == input.TeamUuid);
-            if (team != null)
+            try
             {
-                throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The member is already in this team.");
+                var team = await Repository.FirstOrDefaultAsync(t => t.Id == input.TeamId);
+                if (team.CreatorId != AbpSession.UserId.Value)
+                {
+                    var currentMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.UserId == AbpSession.UserId.Value
+                        && tm.TeamId == input.TeamId && tm.Role == TeamRole.Admin);
+                    if (currentMember == null)
+                    {
+                        throw new UserFriendlyException(
+                            "Access Denied; you are neither the owner nor an admin of this team");
+                    }
+                }
+                var existingRecord = _teamMemberRepository.GetAll().FirstOrDefault(a => a.UserId == input.UserId && a.TeamId == input.TeamId);
+                if (existingRecord != null)
+                {
+                    throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The member is already in this team.");
+                }
+
+                var tm = ObjectMapper.Map<TeamMember>(input);
+                tm.Id = Guid.NewGuid().ToString();
+                var teamMember = await _teamMemberRepository.InsertAsync(tm);
+                return ObjectMapper.Map<TeamMemberDto>(teamMember);
             }
-            if (Repository.GetAll().Any(a => a.Uuid == input.Uuid))
+            catch (Exception e)
             {
-                throw new UserFriendlyException("Team already exists");
+                Console.WriteLine(e);
+                throw;
             }
-            var teamMember = await _teamMembetRepository.InsertAsync(ObjectMapper.Map<TeamMember>(input));
-            await CurrentUnitOfWork.SaveChangesAsync();
-            var dto = ObjectMapper.Map<TeamMemberDto>(teamMember);
-            return dto;
+        }
+
+        public async Task<bool> ChangeRole(ChangeRoleInput input)
+        {
+            var teamMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.Id == input.TeamMemberId);
+            if ((await Repository.CountAsync(t => t.Id == teamMember.TeamId 
+                                                  && t.CreatorId == AbpSession.UserId.Value)) == 0)
+            {
+                throw new UserFriendlyException("You are not the creator of this team");
+            }
+            teamMember.Role = input.Role;
+            await _teamMemberRepository.UpdateAsync(teamMember);
+            return true;
         }
 
         public async Task<TeamMemberDto> RemoveTeamMember(UpdateTeamMemberDto input)
         {
-            var team = _teamMembetRepository.GetAll().FirstOrDefault(a => a.UserId == input.UserId && a.TeamUuid == input.TeamUuid);
-            if (team == null)
+            var team = await Repository.FirstOrDefaultAsync(t => t.Id == input.TeamId);
+            if (team.CreatorId != AbpSession.UserId.Value)
+            {
+                var currentMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.UserId == AbpSession.UserId.Value
+                    && tm.TeamId == input.TeamId && tm.Role == TeamRole.Admin);
+                if (currentMember == null)
+                {
+                    throw new UserFriendlyException(
+                        "Access Denied; you are neither the owner nor an admin of this team");
+                }
+            }
+            var oldRecord = _teamMemberRepository.GetAll().FirstOrDefault(a => a.UserId == input.UserId && a.TeamId == input.TeamId);
+            if (oldRecord == null)
             {
                 throw new UserFriendlyException((int)HttpStatusCode.NotFound, $"The team member not found.");
             }
-            await _teamMembetRepository.DeleteAsync(team);
+            await _teamMemberRepository.DeleteAsync(oldRecord);
             await CurrentUnitOfWork.SaveChangesAsync();
-            return ObjectMapper.Map<TeamMemberDto>(team);
+            return ObjectMapper.Map<TeamMemberDto>(oldRecord);
         }
         
     }
