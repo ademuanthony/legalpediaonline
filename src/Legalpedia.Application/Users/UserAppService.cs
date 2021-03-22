@@ -27,7 +27,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Legalpedia.Users
 {
     [AbpAuthorize(PermissionNames.PagesAdminUsers)]
-    public class UserAppService : AsyncCrudAppService<User, UserDto, long, PagedUserResultRequestDto, CreateUserDto, UserDto>, IUserAppService
+    public class UserAppService : AsyncCrudAppService<User, UserDto, long,
+        PagedUserResultRequestDto, CreateUserDto, UserDto>, IUserAppService
     {
         private readonly UserManager _userManager;
         private readonly RoleManager _roleManager;
@@ -119,7 +120,7 @@ namespace Legalpedia.Users
             return ObjectMapper.Map<UserDto>(user);
         }
         
-        public async Task<bool> ChangeLogo(ChangeLogoInput input)
+        public async Task<bool> ChangeProfilePicture(ChangeLogoInput input)
         {
             try 
             {
