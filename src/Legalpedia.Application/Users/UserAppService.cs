@@ -36,6 +36,7 @@ namespace Legalpedia.Users
         private readonly IAbpSession _abpSession;
         private readonly LogInManager _logInManager;
         private readonly IRepository<UserPicture, string> _pictureRepository;
+        private readonly IRepository<User, long> _userRepository;
 
         public UserAppService(
             IRepository<User, long> repository,
@@ -45,7 +46,8 @@ namespace Legalpedia.Users
             IPasswordHasher<User> passwordHasher,
             IAbpSession abpSession,
             LogInManager logInManager, 
-            IRepository<UserPicture, string> pictureRepository)
+            IRepository<UserPicture, string> pictureRepository, 
+            IRepository<User, long> userRepository)
             : base(repository)
         {
             _userManager = userManager;
@@ -55,8 +57,15 @@ namespace Legalpedia.Users
             _abpSession = abpSession;
             _logInManager = logInManager;
             _pictureRepository = pictureRepository;
+            _userRepository = userRepository;
         }
 
+        public async Task<UserDto> GetProfile(EntityDto<string> input)
+        {
+            var user = await _userRepository.FirstOrDefaultAsync(u => u.UserName == input.Id);
+            return ObjectMapper.Map<UserDto>(user);
+        }
+        
         public override async Task<UserDto> CreateAsync(CreateUserDto input)
         {
             CheckCreatePermission();
