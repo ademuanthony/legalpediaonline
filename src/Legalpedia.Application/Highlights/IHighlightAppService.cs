@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Abp.Application.Services;
-using Abp.Application.Services.Dto;
 using Legalpedia.Models;
 
 namespace Legalpedia.Highlights

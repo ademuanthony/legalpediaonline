@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.UI;
-using Legalpedia.Customers;
 using Legalpedia.Customers.Dto;
 using Legalpedia.Models;
 using Microsoft.AspNetCore.Mvc;

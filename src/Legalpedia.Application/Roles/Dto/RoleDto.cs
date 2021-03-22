@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Abp.Application.Services.Dto;
 using Abp.Authorization.Roles;
-using Abp.AutoMapper;
 using Legalpedia.Authorization.Roles;
 
 namespace Legalpedia.Roles.Dto

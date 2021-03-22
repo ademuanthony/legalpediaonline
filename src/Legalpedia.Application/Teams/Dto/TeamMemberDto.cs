@@ -1,6 +1,5 @@
 ﻿using Abp.AutoMapper;
 using Legalpedia.Models;
-using System;
 using Abp.Application.Services.Dto;
 
 namespace Legalpedia.Teams.Dto

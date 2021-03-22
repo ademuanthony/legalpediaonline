@@ -1,5 +1,4 @@
 ﻿using Abp.Application.Services.Dto;
-using Abp.Domain.Entities;
 
 namespace Legalpedia.ForeignLegalResources.Dtos
 {

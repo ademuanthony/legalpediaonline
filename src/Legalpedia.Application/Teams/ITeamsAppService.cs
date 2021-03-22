@@ -2,7 +2,6 @@
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Legalpedia.Teams.Dto;
-using Legalpedia.Users.Dto;
 
 namespace Legalpedia.Teams
 {
@@ -13,9 +12,9 @@ namespace Legalpedia.Teams
         Task<PagedResultDto<TeamDto>> Filter(FilterTeamDto input);
         Task<string> TeamLogo(EntityDto<string> entityDto);
         Task<PagedResultDto<TeamMemberInfo>> GetTeamMembers(FetchTeamDto input);
-        Task<TeamMemberDto> AddTeamMember(CreateTeamMemberDto input);
+        Task<TeamMemberInfo> AddTeamMember(CreateTeamMemberDto input);
         Task<bool> ChangeRole(ChangeRoleInput input);
-        Task<TeamMemberDto> RemoveTeamMember(UpdateTeamMemberDto input);
+        Task<TeamMemberInfo> RemoveTeamMember(UpdateTeamMemberDto input);
 
     }
 }

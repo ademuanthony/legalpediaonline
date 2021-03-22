@@ -1,7 +1,5 @@
 ﻿using Abp.AutoMapper;
 using Legalpedia.Models;
-using Microsoft.AspNetCore.Http;
-using System;
 using System.ComponentModel.DataAnnotations;
 using Abp.Application.Services.Dto;
 

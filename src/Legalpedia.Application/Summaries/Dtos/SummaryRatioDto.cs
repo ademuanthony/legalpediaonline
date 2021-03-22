@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Abp.Application.Services.Dto;
+﻿using Abp.Application.Services.Dto;
 
 namespace Legalpedia.Summaries.Dtos
 {

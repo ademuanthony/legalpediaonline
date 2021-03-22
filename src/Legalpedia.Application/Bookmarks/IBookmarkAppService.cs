@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Abp.Application.Services;
 using Abp.Domain.Entities;
 using Legalpedia.Bookmarks.Dto;
-using Legalpedia.Dictionaries.Dtos;
 using Legalpedia.Models;
 
 namespace Legalpedia.Bookmarks

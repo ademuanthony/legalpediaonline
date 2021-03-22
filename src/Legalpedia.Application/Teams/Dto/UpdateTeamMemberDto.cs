@@ -1,6 +1,5 @@
 ﻿using Abp.AutoMapper;
 using Legalpedia.Models;
-using System;
 using System.ComponentModel.DataAnnotations;
 using Abp.Application.Services.Dto;
 

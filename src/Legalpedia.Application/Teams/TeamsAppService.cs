@@ -1,26 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Dynamic.Core;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
-using Abp.AutoMapper;
 using Abp.Domain.Repositories;
-using Legalpedia.Authorization;
 using Abp.UI;
 using Legalpedia.Models;
 using Abp.Authorization;
 using Legalpedia.Teams.Dto;
 using System.Net;
-using Legalpedia.Users.Dto;
 using Legalpedia.Authorization.Users;
 using System;
-using System.IO;
-using Microsoft.AspNetCore.Mvc;
-using System.Drawing;
-using System.Drawing.Imaging;
 using Abp.Extensions;
-using Abp.Threading.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Legalpedia.Teams
@@ -44,6 +34,7 @@ namespace Legalpedia.Teams
 
         public override Task<TeamDto> CreateAsync(CreateTeamDto input)
         {
+            if (AbpSession.UserId == null) throw new UserFriendlyException("Please login first");
             if (input.Logo == null)
             {
                 throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team logo is required.");
@@ -173,7 +164,7 @@ namespace Legalpedia.Teams
             return new PagedResultDto<TeamMemberInfo>(totalCount, members);
         }
 
-        public async Task<TeamMemberDto> AddTeamMember(CreateTeamMemberDto input)
+        public async Task<TeamMemberInfo> AddTeamMember(CreateTeamMemberDto input)
         {
             try
             {
@@ -196,8 +187,16 @@ namespace Legalpedia.Teams
 
                 var tm = ObjectMapper.Map<TeamMember>(input);
                 tm.Id = Guid.NewGuid().ToString();
-                var teamMember = await _teamMemberRepository.InsertAsync(tm);
-                return ObjectMapper.Map<TeamMemberDto>(teamMember);
+                await _teamMemberRepository.InsertAndGetIdAsync(tm);
+                var userInfo = await _userRepository.FirstOrDefaultAsync(u => u.Id == input.UserId);
+                return new TeamMemberInfo
+                {
+                    TeamId = input.TeamId,
+                    Role = tm.Role,
+                    Username = userInfo.UserName,
+                    DisplayName = userInfo.FullName,
+                    UserId = tm.UserId
+                };
             }
             catch (Exception e)
             {
@@ -219,9 +218,10 @@ namespace Legalpedia.Teams
             return true;
         }
 
-        public async Task<TeamMemberDto> RemoveTeamMember(UpdateTeamMemberDto input)
+        public async Task<TeamMemberInfo> RemoveTeamMember(UpdateTeamMemberDto input)
         {
             var team = await Repository.FirstOrDefaultAsync(t => t.Id == input.TeamId);
+            if (AbpSession.UserId == null) throw new UserFriendlyException("Please login");
             if (team.CreatorId != AbpSession.UserId.Value)
             {
                 var currentMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.UserId == AbpSession.UserId.Value
@@ -238,8 +238,15 @@ namespace Legalpedia.Teams
                 throw new UserFriendlyException((int)HttpStatusCode.NotFound, $"The team member not found.");
             }
             await _teamMemberRepository.DeleteAsync(oldRecord);
-            await CurrentUnitOfWork.SaveChangesAsync();
-            return ObjectMapper.Map<TeamMemberDto>(oldRecord);
+            var userInfo = await _userRepository.FirstOrDefaultAsync(u => u.Id == input.UserId);
+            return new TeamMemberInfo
+            {
+                TeamId = input.TeamId,
+                Role = oldRecord.Role,
+                Username = userInfo.UserName,
+                DisplayName = userInfo.FullName,
+                UserId = oldRecord.UserId
+            };
         }
         
     }

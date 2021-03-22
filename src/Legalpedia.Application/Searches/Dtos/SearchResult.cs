@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Abp.Application.Services.Dto;
-using Legalpedia.Models;
 using Index = Legalpedia.Models.Index;
 
 namespace Legalpedia.Searches.Dtos
