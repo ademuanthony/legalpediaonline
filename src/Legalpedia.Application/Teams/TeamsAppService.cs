@@ -11,6 +11,7 @@ using System.Net;
 using Legalpedia.Authorization.Users;
 using System;
 using Abp.Extensions;
+using Legalpedia.Authorization.Roles;
 using Microsoft.EntityFrameworkCore;
 
 namespace Legalpedia.Teams
@@ -125,23 +126,24 @@ namespace Legalpedia.Teams
 
             return logo.Base64;
         }
-        public async Task<PagedResultDto<TeamDto>> MyTeams(PagedResultRequestDto input)
+        public async Task<PagedResultDto<MyTeamOutput>> MyTeams(PagedResultRequestDto input)
         {
             var query = from t in Repository.GetAll()
                 join tm in _teamMemberRepository.GetAll() on t.Id equals tm.TeamId
                 where tm.UserId == AbpSession.UserId.Value
-                select t;
+                select new {Team = tm.Team, Role = tm.Role};
 
             var totalCount = await query.CountAsync();
-            var teams = query.OrderBy(t => t.Id)
+            var teams = query.OrderBy(t => t.Team.Id)
                 .Skip(input.SkipCount).Take(input.MaxResultCount)
-                .Select(art =>new TeamDto
+                .Select(art =>new MyTeamOutput
             {
-                Name = art.Name,
-                Description = art.Description,
-                CreatorId = art.CreatorId
+                Name = art.Team.Name,
+                Description = art.Team.Description,
+                CreatorId = art.Team.CreatorId,
+                Role = art.Role
             }).ToList();
-            return new PagedResultDto<TeamDto>(totalCount, teams);
+            return new PagedResultDto<MyTeamOutput>(totalCount, teams);
         }
 
         public async Task<PagedResultDto<TeamMemberInfo>> GetTeamMembers(FetchTeamDto input)

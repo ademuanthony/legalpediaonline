@@ -8,7 +8,7 @@ namespace Legalpedia.Teams
     public interface ITeamsAppService : IAsyncCrudAppService<TeamDto, string,
         PagedResultRequestDto, CreateTeamDto, UpdateTeamDto>
     {
-        Task<PagedResultDto<TeamDto>> MyTeams(PagedResultRequestDto input);
+        Task<PagedResultDto<MyTeamOutput>> MyTeams(PagedResultRequestDto input);
         Task<PagedResultDto<TeamDto>> Filter(FilterTeamDto input);
         Task<string> TeamLogo(EntityDto<string> entityDto);
         Task<PagedResultDto<TeamMemberInfo>> GetTeamMembers(FetchTeamDto input);
