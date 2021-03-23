@@ -59,7 +59,8 @@ namespace Legalpedia.Teams
             }
             catch(Exception ex)
             {
-                throw new UserFriendlyException((int)HttpStatusCode.InternalServerError, ex.Message);
+                Console.WriteLine(ex.Message);
+                // throw new UserFriendlyException((int)HttpStatusCode.InternalServerError, ex.Message);
             }
             input.CreatorId = AbpSession.UserId.Value;
             input.Id = teamId;
