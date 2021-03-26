@@ -125,8 +125,8 @@ namespace Legalpedia.Users
             try 
             {
                 // validate input
-                var base64Data = Regex.Match(input.Base64, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-                Convert.FromBase64String(base64Data);
+                // var base64Data = Regex.Match(input.Base64, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+                // Convert.FromBase64String(base64Data);
                 var picture = await _pictureRepository.FirstOrDefaultAsync(p => p.UserId == _abpSession.UserId.Value);
                 if (picture == null)
                 {

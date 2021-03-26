@@ -52,8 +52,8 @@ namespace Legalpedia.Teams
                 try
                 {
                     // validate input
-                    var base64Data = Regex.Match(input.Logo, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-                    Convert.FromBase64String(base64Data);
+                    // var base64Data = Regex.Match(input.Logo, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+                    // Convert.FromBase64String(base64Data);
                     _teamLogoRepository.Insert(new TeamLogo
                     {
                         Id = Guid.NewGuid().ToString(),
