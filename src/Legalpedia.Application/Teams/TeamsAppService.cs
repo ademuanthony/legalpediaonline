@@ -10,6 +10,7 @@ using Legalpedia.Teams.Dto;
 using System.Net;
 using Legalpedia.Authorization.Users;
 using System;
+using System.Text.RegularExpressions;
 using Abp.Extensions;
 using Legalpedia.Authorization.Roles;
 using Microsoft.EntityFrameworkCore;
@@ -35,37 +36,46 @@ namespace Legalpedia.Teams
 
         public override Task<TeamDto> CreateAsync(CreateTeamDto input)
         {
-            if (AbpSession.UserId == null) throw new UserFriendlyException("Please login first");
-            if (input.Logo == null)
-            {
-                throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team logo is required.");
-            }
-            if (Repository.Count(t=>t.Name.ToLower() == input.Name.ToLower()) > 0)
-            {
-                throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team name '{input.Name}' already exists.");
-            }
-
-            var teamId = Guid.NewGuid().ToString();
             try
             {
-                // validate input
-                Convert.FromBase64String(input.Logo);
-                _teamLogoRepository.Insert(new TeamLogo
+                if (AbpSession.UserId == null) throw new UserFriendlyException("Please login first");
+                if (input.Logo == null)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    TeamId = teamId,
-                    Base64 = input.Logo
-                });
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                // throw new UserFriendlyException((int)HttpStatusCode.InternalServerError, ex.Message);
-            }
-            input.CreatorId = AbpSession.UserId.Value;
-            input.Id = teamId;
+                    throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team logo is required.");
+                }
+                if (Repository.Count(t=>t.Name.ToLower() == input.Name.ToLower()) > 0)
+                {
+                    throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team name '{input.Name}' already exists.");
+                }
+
+                var teamId = Guid.NewGuid().ToString();
+                try
+                {
+                    // validate input
+                    var base64Data = Regex.Match(input.Logo, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+                    Convert.FromBase64String(base64Data);
+                    _teamLogoRepository.Insert(new TeamLogo
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        TeamId = teamId,
+                        Base64 = input.Logo
+                    });
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    // throw new UserFriendlyException((int)HttpStatusCode.InternalServerError, ex.Message);
+                }
+                input.CreatorId = AbpSession.UserId.Value;
+                input.Id = teamId;
             
-            return base.CreateAsync(input);
+                return base.CreateAsync(input);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw new UserFriendlyException(e.Message);
+            }
         }
 
         public override async Task<TeamDto> UpdateAsync(UpdateTeamDto input)
@@ -109,7 +119,7 @@ namespace Legalpedia.Teams
             var teamsQuery = Repository.GetAll().Where(a => a.Name.ToLower().Contains(input.Name.ToLower()));
             var teams = teamsQuery.Select(art => new TeamDto
             {
-                CreatorId = art.CreatorId,
+                CreatorId = art.CreatorUserId.Value,
                 Name = art.Name,
                 Description = art.Description,
             }).OrderBy(art => art.Id).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
@@ -141,7 +151,7 @@ namespace Legalpedia.Teams
             {
                 Name = art.Team.Name,
                 Description = art.Team.Description,
-                CreatorId = art.Team.CreatorId,
+                CreatorId = art.Team.CreatorUserId.Value,
                 Role = art.Role
             }).ToList();
             return new PagedResultDto<MyTeamOutput>(totalCount, teams);
@@ -172,7 +182,7 @@ namespace Legalpedia.Teams
             try
             {
                 var team = await Repository.FirstOrDefaultAsync(t => t.Id == input.TeamId);
-                if (team.CreatorId != AbpSession.UserId.Value)
+                if (team.CreatorUserId != AbpSession.UserId.Value)
                 {
                     var currentMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.UserId == AbpSession.UserId.Value
                         && tm.TeamId == input.TeamId && tm.Role == TeamRole.Admin);
@@ -212,7 +222,7 @@ namespace Legalpedia.Teams
         {
             var teamMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.Id == input.TeamMemberId);
             if ((await Repository.CountAsync(t => t.Id == teamMember.TeamId 
-                                                  && t.CreatorId == AbpSession.UserId.Value)) == 0)
+                                                  && t.CreatorUserId == AbpSession.UserId.Value)) == 0)
             {
                 throw new UserFriendlyException("You are not the creator of this team");
             }
@@ -225,7 +235,7 @@ namespace Legalpedia.Teams
         {
             var team = await Repository.FirstOrDefaultAsync(t => t.Id == input.TeamId);
             if (AbpSession.UserId == null) throw new UserFriendlyException("Please login");
-            if (team.CreatorId != AbpSession.UserId.Value)
+            if (team.CreatorUserId != AbpSession.UserId.Value)
             {
                 var currentMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.UserId == AbpSession.UserId.Value
                     && tm.TeamId == input.TeamId && tm.Role == TeamRole.Admin);
