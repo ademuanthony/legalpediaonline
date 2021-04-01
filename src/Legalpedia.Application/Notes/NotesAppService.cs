@@ -50,25 +50,7 @@ namespace Legalpedia.Notes
             var noteId = Guid.NewGuid();
             note.Id = noteId.ToString();
             note.CreatedAt = DateTime.Now;
-            var uniqueFileName = $"{noteId}:N.png";
-            var uploads = Path.Combine(_hostingEnvironment.WebRootPath, LegalpediaConsts.NotesImageFolder);
-            if(!Directory.Exists(uploads))
-            {
-                Directory.CreateDirectory(uploads);
-            }
-            var filePath = Path.Combine(uploads, uniqueFileName);
-            try
-            {
-                var bytes = Convert.FromBase64String(input.ImageContent);
-                await using var ms = new MemoryStream(bytes);
-                using var image = Image.FromStream(ms);
-                image.Save(filePath, ImageFormat.Png);
-            }
-            catch(Exception ex)
-            {
-                throw new UserFriendlyException((int)HttpStatusCode.InternalServerError, ex.Message);
-            }
-            note.Image = uniqueFileName;
+            note.Image = input.ImageContent;
             await _noteRepository.InsertAsync(note);
             return note;
         }
@@ -104,29 +86,7 @@ namespace Legalpedia.Notes
                 note.Summary = input.Summary;
             }
 
-            if (!input.ImageContent.IsNullOrEmpty())
-            {
-                var uniqueFileName = !note.Image.IsNullOrEmpty() ? note.Image : $"{input.Id}.png";
-                var uploads = Path.Combine(_hostingEnvironment.WebRootPath, LegalpediaConsts.NotesImageFolder);
-                if(!Directory.Exists(uploads))
-                {
-                    Directory.CreateDirectory(uploads);
-                }
-                var filePath = Path.Combine(uploads, uniqueFileName);
-                try
-                {
-                    var bytes = Convert.FromBase64String(input.ImageContent);
-                    await using var ms = new MemoryStream(bytes);
-                    using var image = Image.FromStream(ms);
-                    image.Save(filePath, ImageFormat.Png);
-                }
-                catch(Exception ex)
-                {
-                    throw new UserFriendlyException((int)HttpStatusCode.InternalServerError, ex.Message);
-                }
-                note.Image = uniqueFileName;
-            }
-
+            note.Image = input.ImageContent;
             note.AccessType = input.AccessType;
 
             await _noteRepository.UpdateAsync(note);
