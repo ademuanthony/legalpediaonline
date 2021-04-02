@@ -55,6 +55,11 @@ namespace Legalpedia.Notes
             return note;
         }
 
+        public async Task<Note> GetNote(EntityDto<string> input)
+        {
+            return await _noteRepository.FirstOrDefaultAsync(n => n.Id == input.Id);
+        }
+        
         public async Task<Note> UpdateNote(UpdateNoteDto input)
         {
             var note = await _noteRepository.FirstOrDefaultAsync(n => n.Id == input.Id);
