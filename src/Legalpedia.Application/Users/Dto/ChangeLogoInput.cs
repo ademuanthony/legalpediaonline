@@ -5,6 +5,12 @@ namespace Legalpedia.Users.Dto
     public class ChangeLogoInput
     {
         [Required]
-        public string Base64 { get; set; }
+        public string Image { get; set; }
+    }
+    
+    public class ChangePictureInput
+    {
+        [Required]
+        public string Image { get; set; }
     }
 }

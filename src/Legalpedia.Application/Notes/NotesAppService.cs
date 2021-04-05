@@ -55,9 +55,35 @@ namespace Legalpedia.Notes
             return note;
         }
 
-        public async Task<Note> GetNote(EntityDto<string> input)
+        private NoteDto MarkFavourite(NoteDto note)
         {
-            return await _noteRepository.FirstOrDefaultAsync(n => n.Id == input.Id);
+            var fn = _favouriteNoteRepository.FirstOrDefault(f => f.NoteId == note.Id &&
+                                                                  f.UserId == AbpSession.UserId.Value);
+            note.Favourite = fn != null;
+            return note;
+        }
+
+        private List<string> FavouriteNoteIds()
+        {
+            return _favouriteNoteRepository.GetAll().Where(f => f.UserId == AbpSession.UserId.Value)
+                .Select(n => n.NoteId).ToList();
+        }
+
+        private List<NoteDto> MarkFavourites(List<NoteDto> notes)
+        {
+            var ids = FavouriteNoteIds();
+            foreach (var note in notes)
+            {
+                note.Favourite = ids.Contains(note.Id);
+            }
+
+            return notes;
+        }
+        
+        public async Task<NoteDto> GetNote(EntityDto<string> input)
+        {
+            var note = await _noteRepository.FirstOrDefaultAsync(n => n.Id == input.Id);
+            return MarkFavourite(ObjectMapper.Map<NoteDto>(note));
         }
         
         public async Task<Note> UpdateNote(UpdateNoteDto input)
@@ -107,7 +133,7 @@ namespace Legalpedia.Notes
             await _noteRepository.DeleteAsync(n => n.Id == input.Id);
         }
 
-        public PagedResultDto<Note> MyNotes(NotesRequest input)
+        public PagedResultDto<NoteDto> MyNotes(NotesRequest input)
         {
             var query = _noteRepository.GetAll()
                 .Where(n => n.CreatorId == AbpSession.UserId.Value);
@@ -118,10 +144,11 @@ namespace Legalpedia.Notes
             var totalCount = query.Count();
             var notes = query.OrderBy(n => n.CreatedAt)
                 .Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
-            return new PagedResultDto<Note>(totalCount, notes);
+            var fNotes = MarkFavourites(ObjectMapper.Map<List<NoteDto>>(notes));
+            return new PagedResultDto<NoteDto>(totalCount, fNotes);
         }
         
-        public PagedResultDto<Note> PublicNotes(NotesRequest input)
+        public PagedResultDto<NoteDto> PublicNotes(NotesRequest input)
         {
             var query = _noteRepository.GetAll()
                 .Where(n => n.AccessType == NoteAccessType.Public);
@@ -132,10 +159,12 @@ namespace Legalpedia.Notes
             var totalCount = query.Count();
             var notes = query.OrderBy(n => n.CreatedAt)
                 .Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
-            return new PagedResultDto<Note>(totalCount, notes);
+            
+            var fNotes = MarkFavourites(ObjectMapper.Map<List<NoteDto>>(notes));
+            return new PagedResultDto<NoteDto>(totalCount, fNotes);
         }
         
-        public PagedResultDto<Note> TeamNotes(TeamNotesRequest input)
+        public PagedResultDto<NoteDto> TeamNotes(TeamNotesRequest input)
         {
             var query = _noteRepository.GetAll()
                 .Where(n => n.TeamId == input.TeamId);
@@ -146,7 +175,9 @@ namespace Legalpedia.Notes
             var totalCount = query.Count();
             var notes = query.OrderBy(n => n.CreatedAt)
                 .Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
-            return new PagedResultDto<Note>(totalCount, notes);
+            
+            var fNotes = MarkFavourites(ObjectMapper.Map<List<NoteDto>>(notes));
+            return new PagedResultDto<NoteDto>(totalCount, fNotes);
         }
 
         public async Task ToggleFavourite(EntityDto<string> input)
@@ -170,7 +201,7 @@ namespace Legalpedia.Notes
             }
         }
         
-        public PagedResultDto<Note> FavouriteNotes(NotesRequest input)
+        public PagedResultDto<NoteDto> FavouriteNotes(NotesRequest input)
         {
             var query = from n in _noteRepository.GetAll()
                 join fn in _favouriteNoteRepository.GetAll() on n.Id equals fn.NoteId
@@ -182,7 +213,9 @@ namespace Legalpedia.Notes
             var totalCount = query.Count();
             var notes = query.OrderBy(n => n.CreatedAt)
                 .Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
-            return new PagedResultDto<Note>(totalCount, notes);
+            
+            var fNotes = MarkFavourites(ObjectMapper.Map<List<NoteDto>>(notes));
+            return new PagedResultDto<NoteDto>(totalCount, fNotes);
         }
 
         public async Task<NoteComment> AddComment(NoteComment comment)

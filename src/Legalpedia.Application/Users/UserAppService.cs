@@ -120,7 +120,7 @@ namespace Legalpedia.Users
             return ObjectMapper.Map<UserDto>(user);
         }
         
-        public async Task<bool> ChangeProfilePicture(ChangeLogoInput input)
+        public async Task<bool> ChangeProfilePicture(ChangePictureInput input)
         {
             try 
             {
@@ -131,12 +131,40 @@ namespace Legalpedia.Users
                     {
                         Id = Guid.NewGuid().ToString(),
                         UserId = AbpSession.UserId.Value,
-                        Base64 = input.Base64
+                        Content = input.Image
                     });
                     return true;
                 }
 
-                picture.Base64 = input.Base64;
+                picture.Content = input.Image;
+                await _pictureRepository.UpdateAsync(picture);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                throw;
+            }
+        }
+
+        
+        public async Task<bool> ChangePicture(string input)
+        {
+            try 
+            {
+                var picture = await _pictureRepository.FirstOrDefaultAsync(p => p.UserId == _abpSession.UserId.Value);
+                if (picture == null)
+                {
+                    await _pictureRepository.InsertAsync(new UserPicture
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        UserId = AbpSession.UserId.Value,
+                        Content = input
+                    });
+                    return true;
+                }
+
+                picture.Content = input;
                 await _pictureRepository.UpdateAsync(picture);
                 return true;
             }

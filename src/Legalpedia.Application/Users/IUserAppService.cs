@@ -18,7 +18,7 @@ namespace Legalpedia.Users
         Task ChangeLanguage(ChangeUserLanguageDto input);
 
         Task<bool> ChangePassword(ChangePasswordDto input);
-        Task<bool> ChangeProfilePicture(ChangeLogoInput input);
+        Task<bool> ChangeProfilePicture(ChangePictureInput input);
         Task<UserPicture> MyProfilePicture();
         Task<UserPicture> ProfilePicture(long userId);
         Task<UserDto> UpdateBio(UpdateBioInput input);
