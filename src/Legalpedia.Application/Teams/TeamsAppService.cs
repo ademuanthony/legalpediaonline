@@ -34,7 +34,7 @@ namespace Legalpedia.Teams
             _teamLogoRepository = teamLogoRepository;
         }
 
-        public override Task<TeamDto> CreateAsync(CreateTeamDto input)
+        public override async Task<TeamDto> CreateAsync(CreateTeamDto input)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace Legalpedia.Teams
                 {
                     throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team logo is required.");
                 }
-                if (Repository.Count(t=>t.Name.ToLower() == input.Name.ToLower()) > 0)
+                if (await Repository.CountAsync(t=>t.Name.ToLower() == input.Name.ToLower()) > 0)
                 {
                     throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team name '{input.Name}' already exists.");
                 }
@@ -54,7 +54,7 @@ namespace Legalpedia.Teams
                     // validate input
                     // var base64Data = Regex.Match(input.Logo, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
                     // Convert.FromBase64String(base64Data);
-                    _teamLogoRepository.Insert(new TeamLogo
+                    await _teamLogoRepository.InsertAsync(new TeamLogo
                     {
                         Id = Guid.NewGuid().ToString(),
                         TeamId = teamId,
@@ -66,10 +66,17 @@ namespace Legalpedia.Teams
                     Console.WriteLine(ex.Message);
                     // throw new UserFriendlyException((int)HttpStatusCode.InternalServerError, ex.Message);
                 }
-                input.CreatorId = AbpSession.UserId.Value;
-                input.Id = teamId;
-            
-                return base.CreateAsync(input);
+
+                var team = new Team
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = input.Name,
+                    Description = input.Description,
+                    CreationTime = DateTime.Now,
+                    CreatorUserId = AbpSession.UserId.Value,
+                };
+                await Repository.InsertAsync(team);
+                return ObjectMapper.Map<TeamDto>(team);
             }
             catch (Exception e)
             {

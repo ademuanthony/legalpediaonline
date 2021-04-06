@@ -11,6 +11,7 @@ using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.UI;
+using Legalpedia.Authorization.Users;
 using Legalpedia.Models;
 using Legalpedia.Notes.Dto;
 using Microsoft.AspNetCore.Hosting;
@@ -25,6 +26,7 @@ namespace Legalpedia.Notes
         private readonly IRepository<NoteComment, string> _commentRepository;
         private readonly IRepository<SharedNote, string> _sharedNoteRepository;
         private readonly IRepository<NoteRating, string> _noteRatingRepository;
+        private readonly IRepository<User, long> _userRepository;
         private readonly IWebHostEnvironment _hostingEnvironment;
         
         public NotesAppService(IRepository<Note, string> noteRepository, 
@@ -32,7 +34,8 @@ namespace Legalpedia.Notes
             IRepository<FavouriteNote, string> favouriteNoteRepository, 
             IRepository<NoteComment, string> commentRepository, 
             IRepository<SharedNote, string> sharedNoteRepository, 
-            IRepository<NoteRating, string> noteRatingRepository)
+            IRepository<NoteRating, string> noteRatingRepository, 
+            IRepository<User, long> userRepository)
         {
             _noteRepository = noteRepository;
             _hostingEnvironment = hostingEnvironment;
@@ -40,6 +43,7 @@ namespace Legalpedia.Notes
             _commentRepository = commentRepository;
             _sharedNoteRepository = sharedNoteRepository;
             _noteRatingRepository = noteRatingRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<Note> CreateNote(CreateNoteDto input)
@@ -260,9 +264,21 @@ namespace Legalpedia.Notes
             await _commentRepository.DeleteAsync(oldComment);
         }
 
-        public List<NoteComment> GetComments(EntityDto<string> input)
+        public List<NoteCommentDto> GetComments(EntityDto<string> input)
         {
-            return _commentRepository.GetAll().Where(c => c.NoteId == input.Id).ToList();
+            var comments = from c in _commentRepository.GetAll()
+                join u in _userRepository.GetAll() on c.CreatorId equals u.Id
+                select new NoteCommentDto
+                {
+                    Id = c.Id,
+                    Body = c.Body,
+                    CreatedAt = c.CreatedAt,
+                    CreatorId = c.CreatorId,
+                    CreatorName = u.FullName,
+                    NoteId = c.NoteId,
+                    AllowEdit = c.CreatorId == u.Id
+                };
+            return comments.ToList();
         }
 
         public async Task<NoteRating> AddRating(NoteRating input)

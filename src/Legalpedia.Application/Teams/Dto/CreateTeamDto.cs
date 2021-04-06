@@ -6,9 +6,8 @@ using Abp.Application.Services.Dto;
 namespace Legalpedia.Teams.Dto
 {
     [AutoMapTo(typeof(Team))]
-    public class CreateTeamDto:EntityDto<string>
+    public class CreateTeamDto
     {
-        public long CreatorId { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
