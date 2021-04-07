@@ -10,9 +10,7 @@ using Legalpedia.Teams.Dto;
 using System.Net;
 using Legalpedia.Authorization.Users;
 using System;
-using System.Text.RegularExpressions;
 using Abp.Extensions;
-using Legalpedia.Authorization.Roles;
 using Microsoft.EntityFrameworkCore;
 
 namespace Legalpedia.Teams
@@ -34,11 +32,12 @@ namespace Legalpedia.Teams
             _teamLogoRepository = teamLogoRepository;
         }
 
+        
         public override async Task<TeamDto> CreateAsync(CreateTeamDto input)
         {
             try
             {
-                if (AbpSession.UserId == null) throw new UserFriendlyException("Please login first");
+                if (AbpSession.UserId == null) throw new UserFriendlyException((int)HttpStatusCode.Unauthorized, "Please login first");
                 if (input.Logo == null)
                 {
                     throw new UserFriendlyException((int)HttpStatusCode.BadRequest, $"The team logo is required.");
@@ -64,7 +63,7 @@ namespace Legalpedia.Teams
                 catch(Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    // throw new UserFriendlyException((int)HttpStatusCode.InternalServerError, ex.Message);
+                    throw new UserFriendlyException((int)HttpStatusCode.InternalServerError, ex.Message);
                 }
 
                 var team = new Team

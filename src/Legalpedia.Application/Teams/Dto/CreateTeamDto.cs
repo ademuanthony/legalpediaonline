@@ -5,7 +5,6 @@ using Abp.Application.Services.Dto;
 
 namespace Legalpedia.Teams.Dto
 {
-    [AutoMapTo(typeof(Team))]
     public class CreateTeamDto
     {
         [Required]

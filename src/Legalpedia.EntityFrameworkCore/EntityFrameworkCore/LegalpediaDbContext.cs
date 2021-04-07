@@ -15,6 +15,7 @@ namespace Legalpedia.EntityFrameworkCore
         /* Define a DbSet for each entity of the application */
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamMember> TeamMembers { get; set; }
+        public DbSet<TeamLogo> TeamLogos { get; set; }
         
         public DbSet<Note> Notes { get; set; }
         public DbSet<FavouriteNote> FavouriteNotes { get; set; }
