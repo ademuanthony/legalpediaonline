@@ -222,18 +222,26 @@ namespace Legalpedia.Notes
             return new PagedResultDto<NoteDto>(totalCount, fNotes);
         }
 
-        public async Task<NoteComment> AddComment(NoteComment comment)
+        public async Task<NoteCommentDto> AddComment(AddCommentInput input)
         {
+            var comment = new NoteComment
+            {
+                NoteId = input.NoteId,
+                Body = input.Body
+            };
             comment.CreatorId = AbpSession.UserId.Value;
             comment.CreatedAt = DateTime.Now;
             comment.Id = Guid.NewGuid().ToString();
             await _commentRepository.InsertAsync(comment);
-            return comment;
+            var dto = ObjectMapper.Map<NoteCommentDto>(comment);
+            var user = await _userRepository.FirstOrDefaultAsync(u => u.Id == AbpSession.UserId.Value);
+            dto.CreatorName = user.FullName;
+            return dto;
         }
 
-        public async Task<NoteComment> UpdateComment(NoteComment comment)
+        public async Task<NoteCommentDto> UpdateComment(UpdateCommentInput input)
         {
-            var oldComment = _commentRepository.FirstOrDefault(c => c.Id == comment.Id);
+            var oldComment = _commentRepository.FirstOrDefault(c => c.Id == input.Id);
             if (oldComment == null)
             {
                 throw new UserFriendlyException("Comment not found");
@@ -244,9 +252,12 @@ namespace Legalpedia.Notes
                 throw new UserFriendlyException("Access denied. You didn't add this comment");
             }
 
-            oldComment.Body = comment.Body;
+            oldComment.Body = input.Body;
             await _commentRepository.UpdateAsync(oldComment);
-            return oldComment;
+            var dto = ObjectMapper.Map<NoteCommentDto>(oldComment);
+            var user = await _userRepository.FirstOrDefaultAsync(u => u.Id == AbpSession.UserId.Value);
+            dto.CreatorName = user.FullName;
+            return dto;
         }
 
         public async Task DeleteComment(EntityDto<string> input)
