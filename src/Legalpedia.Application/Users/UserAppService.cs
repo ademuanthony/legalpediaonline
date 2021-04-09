@@ -131,12 +131,12 @@ namespace Legalpedia.Users
                     {
                         Id = Guid.NewGuid().ToString(),
                         UserId = AbpSession.UserId.Value,
-                        Content = input.Image
+                        Base64 = input.Image
                     });
                     return true;
                 }
 
-                picture.Content = input.Image;
+                picture.Base64 = input.Image;
                 await _pictureRepository.UpdateAsync(picture);
                 return true;
             }
@@ -147,7 +147,6 @@ namespace Legalpedia.Users
             }
         }
 
-        
         public async Task<bool> ChangePicture(string input)
         {
             try 
@@ -159,12 +158,12 @@ namespace Legalpedia.Users
                     {
                         Id = Guid.NewGuid().ToString(),
                         UserId = AbpSession.UserId.Value,
-                        Content = input
+                        Base64 = input
                     });
                     return true;
                 }
 
-                picture.Content = input;
+                picture.Base64 = input;
                 await _pictureRepository.UpdateAsync(picture);
                 return true;
             }

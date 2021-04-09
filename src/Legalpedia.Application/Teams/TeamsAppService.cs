@@ -75,6 +75,14 @@ namespace Legalpedia.Teams
                     CreatorUserId = AbpSession.UserId.Value,
                 };
                 await Repository.InsertAsync(team);
+
+                await _teamMemberRepository.InsertAsync(new TeamMember
+                {
+                    TeamId = team.Id,
+                    UserId = AbpSession.UserId.Value,
+                    Id = Guid.NewGuid().ToString(),
+                    Role = TeamRole.Owner,
+                });
                 return ObjectMapper.Map<TeamDto>(team);
             }
             catch (Exception e)
@@ -143,24 +151,33 @@ namespace Legalpedia.Teams
 
             return logo.Base64;
         }
+        
         public async Task<PagedResultDto<MyTeamOutput>> MyTeams(PagedResultRequestDto input)
         {
-            var query = from t in Repository.GetAll()
-                join tm in _teamMemberRepository.GetAll() on t.Id equals tm.TeamId
-                where tm.UserId == AbpSession.UserId.Value
-                select new {Team = tm.Team, Role = tm.Role};
-
-            var totalCount = await query.CountAsync();
-            var teams = query.OrderBy(t => t.Team.Id)
-                .Skip(input.SkipCount).Take(input.MaxResultCount)
-                .Select(art =>new MyTeamOutput
+            try
             {
-                Name = art.Team.Name,
-                Description = art.Team.Description,
-                CreatorId = art.Team.CreatorUserId.Value,
-                Role = art.Role
-            }).ToList();
-            return new PagedResultDto<MyTeamOutput>(totalCount, teams);
+                var query = from t in Repository.GetAll()
+                    join tm in _teamMemberRepository.GetAll() on t.Id equals tm.TeamId
+                    where tm.UserId == AbpSession.UserId.Value
+                    select new {Team = tm.Team, Role = tm.Role};
+
+                var totalCount = await query.CountAsync();
+                var teams = query.OrderBy(t => t.Team.Id)
+                    .Skip(input.SkipCount).Take(input.MaxResultCount)
+                    .Select(art => new MyTeamOutput
+                    {
+                        Id = art.Team.Id,
+                        Name = art.Team.Name,
+                        Description = art.Team.Description,
+                        CreatorId = art.Team.CreatorUserId.Value,
+                        Role = art.Role
+                    }).ToList();
+                return new PagedResultDto<MyTeamOutput>(totalCount, teams);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public async Task<PagedResultDto<TeamMemberInfo>> GetTeamMembers(FetchTeamDto input)
@@ -171,6 +188,7 @@ namespace Legalpedia.Teams
                 where tm.TeamId == input.TeamId
                 select new TeamMemberInfo
                 {
+                    TeamId =  tm.TeamId,
                     Role = tm.Role, 
                     Username = u.UserName, 
                     DisplayName = u.FullName, 
