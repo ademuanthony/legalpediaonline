@@ -68,7 +68,7 @@ namespace Legalpedia.Teams
 
                 var team = new Team
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = teamId,
                     Name = input.Name,
                     Description = input.Description,
                     CreationTime = DateTime.Now,
@@ -98,7 +98,7 @@ namespace Legalpedia.Teams
 
             try
             {
-                Convert.FromBase64String(input.Logo);
+                // Convert.FromBase64String(input.Logo);
                 var logo = await _teamLogoRepository.FirstOrDefaultAsync(tl => tl.TeamId == input.Id);
                 if (logo == null)
                 {
