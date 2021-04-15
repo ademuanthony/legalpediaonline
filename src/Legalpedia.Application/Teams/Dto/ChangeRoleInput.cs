@@ -4,7 +4,9 @@ namespace Legalpedia.Teams.Dto
 {
     public class ChangeRoleInput
     {
-        public string TeamMemberId { get; set; }
+        public long UserId { get; set; }
+        
+        public string TeamId { get; set; }
         
         public TeamRole Role { get; set; }
     }

@@ -244,7 +244,12 @@ namespace Legalpedia.Teams
 
         public async Task<bool> ChangeRole(ChangeRoleInput input)
         {
-            var teamMember = await _teamMemberRepository.FirstOrDefaultAsync(tm => tm.Id == input.TeamMemberId);
+            var teamMember = await _teamMemberRepository.
+                FirstOrDefaultAsync(tm => tm.TeamId == input.TeamId && tm.UserId == input.UserId);
+            if (teamMember == null)
+            {
+                throw new UserFriendlyException("The selected user is not in this team");
+            }
             if ((await Repository.CountAsync(t => t.Id == teamMember.TeamId 
                                                   && t.CreatorUserId == AbpSession.UserId.Value)) == 0)
             {

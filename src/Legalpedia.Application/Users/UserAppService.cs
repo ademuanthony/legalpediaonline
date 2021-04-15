@@ -73,6 +73,7 @@ namespace Legalpedia.Users
 
             var user = ObjectMapper.Map<User>(input);
 
+            user.Id = await _userRepository.CountAsync() + 1;
             user.TenantId = AbpSession.TenantId;
             user.IsEmailConfirmed = true;
 
