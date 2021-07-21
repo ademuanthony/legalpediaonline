@@ -41,11 +41,12 @@ namespace Legalpedia.Highlights
             _repository.Delete(highlight);
         }
 
-        public List<Highlight> GetAll(string caseId)
+        public List<Highlight> GetAll(string contentId, ContentType contentType)
         {
             return _repository.GetAll()
-                .Where(h => h.CaseId == caseId && h.UserId == AbpSession.UserId.Value)
-                .OrderByDescending(h=>h.StartIndex)
+                .Where(h => h.ContentId == contentId && h.UserId == AbpSession.UserId.Value &&
+                            h.ContentType == contentType)
+                .OrderByDescending(h => h.StartIndex)
                 .ToList();
         }
 

@@ -7,7 +7,7 @@ namespace Legalpedia.Annotations
     {
         Annotation Create(Annotation input);
         void Clear(string id);
-        List<Annotation> GetAll(string caseId);
+        List<Annotation> GetAll(string caseId, ContentType contentType);
         List<Annotation> GetByCollectionId(string collectionId);
         List<Annotation> Search(string term);
     }

@@ -8,7 +8,7 @@ namespace Legalpedia.Highlights
     {
         Highlight Create(Highlight input);
         void Clear(string id);
-        List<Highlight> GetAll(string caseId);
+        List<Highlight> GetAll(string caseId, ContentType contentType);
         List<Highlight> GetByCollectionId(string collectionId);
     }
 }

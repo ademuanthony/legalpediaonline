@@ -39,11 +39,12 @@ namespace Legalpedia.Annotations
             _repository.Delete(highlight);
         }
 
-        public List<Annotation> GetAll(string caseId)
+        public List<Annotation> GetAll(string caseId, ContentType contentType)
         {
             return _repository.GetAll()
-                .Where(h => h.CaseId == caseId && h.UserId == AbpSession.UserId.Value)
-                .OrderByDescending(h=>h.StartIndex)
+                .Where(h => h.ContentId == caseId && h.UserId == AbpSession.UserId.Value &&
+                            h.ContentType == contentType)
+                .OrderByDescending(h => h.StartIndex)
                 .ToList();
         }
 
