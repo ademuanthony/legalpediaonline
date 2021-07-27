@@ -10,17 +10,57 @@ namespace Legalpedia.Annotations
     public class AnnotationAppService: LegalpediaAppServiceBase, IAnnotationAppService
     {
         private readonly IRepository<Annotation, string> _repository;
+        private readonly IRepository<AnnotationTag> _tagRepository;
 
-        public AnnotationAppService(IRepository<Annotation, string> repository)
+        public AnnotationAppService(IRepository<Annotation, string> repository, 
+            IRepository<AnnotationTag> tagRepository)
         {
             _repository = repository;
+            _tagRepository = tagRepository;
         }
 
         public Annotation Create(Annotation input)
         {
             if (AbpSession.UserId != null) input.UserId = AbpSession.UserId.Value;
-            input.Id = Guid.NewGuid().ToString();
+            // input.Id = Guid.NewGuid().ToString();
             _repository.Insert(input);
+            var tags = input.Tags.Split("|");
+            foreach (var tag in tags)
+            {
+                if (!_tagRepository.GetAll().Any(t => t.Tag.ToLower() == tag.ToLower()))
+                {
+                    _tagRepository.Insert(new AnnotationTag{Tag = tag});
+                }
+            }
+            return input;
+        }
+
+        public Annotation Update(Annotation input)
+        {
+            var annotation = _repository.FirstOrDefault(an => an.Id == input.Id);
+            if (annotation == null)
+            {
+                throw new UserFriendlyException("Highlight not found");
+            }
+            if (input.Visibility != Visibility.Public && annotation.UserId != AbpSession.UserId)
+            {
+                throw new UserFriendlyException("Access denied");
+            }
+
+            annotation.Blob = input.Blob;
+            annotation.Comment = input.Comment;
+            annotation.Replies = input.Replies;
+            annotation.Tags = input.Tags;
+            annotation.Visibility = input.Visibility;
+            _repository.Update(annotation);
+            var tags = input.Tags.Split("|");
+            foreach (var tag in tags)
+            {
+                if (!_tagRepository.GetAll().Any(t => t.Tag.ToLower() == tag.ToLower()))
+                {
+                    _tagRepository.Insert(new AnnotationTag{Tag = tag});
+                }
+            }
             return input;
         }
 
@@ -39,24 +79,28 @@ namespace Legalpedia.Annotations
             _repository.Delete(highlight);
         }
 
-        public List<Annotation> GetAll(string caseId, ContentType contentType)
+        public List<Annotation> GetAll(string contentId, ContentType contentType)
         {
             return _repository.GetAll()
-                .Where(h => h.ContentId == caseId && h.UserId == AbpSession.UserId.Value &&
-                            h.ContentType == contentType)
-                .OrderByDescending(h => h.StartIndex)
+                .Where(an => an.ContentId == contentId &&
+                            (an.UserId == AbpSession.UserId.Value || an.Visibility == Visibility.Public) &&
+                            an.ContentType == contentType)
                 .ToList();
-        }
-
-        public List<Annotation> GetByCollectionId(string collectionId)
-        {
-            return _repository.GetAll().Where(h => h.CollectionId == collectionId).ToList();
         }
 
         public List<Annotation> Search(string term)
         {
-            return _repository.GetAll().Where(an => an.Note.ToLower().Contains(term.ToLower()))
+            return _repository.GetAll().Where(
+                    an => (an.Comment.ToLower().Contains(term.ToLower()) ||
+                           an.Replies.ToLower().Contains(term.ToLower())) &&
+                          (an.UserId == AbpSession.UserId.Value ||
+                           an.Visibility == Visibility.Public))
                 .ToList();
+        }
+
+        public List<string> Tags()
+        {
+            return _tagRepository.GetAll().Select(t=>t.Tag).ToList();
         }
     }
 }

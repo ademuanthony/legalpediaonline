@@ -3,15 +3,17 @@ using System;
 using Legalpedia.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Legalpedia.Migrations
 {
     [DbContext(typeof(LegalpediaDbContext))]
-    partial class LegalpediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210726062408_RemoveHighlight")]
+    partial class RemoveHighlight
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1555,15 +1557,6 @@ namespace Legalpedia.Migrations
                     b.Property<int>("ContentType")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Replies")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Tags")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextTarget")
-                        .HasColumnType("text");
-
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
@@ -1573,21 +1566,6 @@ namespace Legalpedia.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Anotations");
-                });
-
-            modelBuilder.Entity("Legalpedia.Models.AnnotationTag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<string>("Tag")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AnnotationTags");
                 });
 
             modelBuilder.Entity("Legalpedia.Models.AreaOfLaw", b =>

@@ -3,15 +3,17 @@ using System;
 using Legalpedia.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Legalpedia.Migrations
 {
     [DbContext(typeof(LegalpediaDbContext))]
-    partial class LegalpediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210725171626_HighlighText")]
+    partial class HighlighText
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1538,58 +1540,6 @@ namespace Legalpedia.Migrations
                     b.ToTable("UserPictures");
                 });
 
-            modelBuilder.Entity("Legalpedia.Models.Annotation", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Blob")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ContentId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("ContentType")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Replies")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Tags")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TextTarget")
-                        .HasColumnType("text");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Visibility")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Anotations");
-                });
-
-            modelBuilder.Entity("Legalpedia.Models.AnnotationTag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<string>("Tag")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AnnotationTags");
-                });
-
             modelBuilder.Entity("Legalpedia.Models.AreaOfLaw", b =>
                 {
                     b.Property<int>("Id")
@@ -1875,6 +1825,49 @@ namespace Legalpedia.Migrations
                     b.HasKey("Uuid");
 
                     b.ToTable("forms_precedence");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Highlight", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CollectionId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ContentType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Length")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PageNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SectionId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("StartIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Highlights");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Highlight");
                 });
 
             modelBuilder.Entity("Legalpedia.Models.HoldenAt", b =>
@@ -3140,6 +3133,16 @@ namespace Legalpedia.Migrations
                     b.ToTable("AbpPermissions");
 
                     b.HasDiscriminator().HasValue("UserPermissionSetting");
+                });
+
+            modelBuilder.Entity("Legalpedia.Models.Annotation", b =>
+                {
+                    b.HasBaseType("Legalpedia.Models.Highlight");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
+                    b.HasDiscriminator().HasValue("Annotation");
                 });
 
             modelBuilder.Entity("Abp.Authorization.Roles.RoleClaim", b =>
