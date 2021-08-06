@@ -1,3 +1,4 @@
+using System;
 using Abp.Domain.Entities;
 
 namespace Legalpedia.Models
@@ -6,6 +7,7 @@ namespace Legalpedia.Models
     {
         public long UserId { get; set; }
         public string ContentId { get; set; }
+        public DateTime CreationDate { get; set; }
         public ContentType ContentType { get; set; }
         public Visibility Visibility { get; set; }
         public string TextTarget { get; set; }

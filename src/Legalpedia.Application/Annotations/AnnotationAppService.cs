@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.UI;
 using Legalpedia.Models;
@@ -23,6 +24,7 @@ namespace Legalpedia.Annotations
         {
             if (AbpSession.UserId != null) input.UserId = AbpSession.UserId.Value;
             // input.Id = Guid.NewGuid().ToString();
+            input.CreationDate = DateTime.Now;
             _repository.Insert(input);
             var tags = input.Tags.Split("|");
             foreach (var tag in tags)
@@ -88,14 +90,23 @@ namespace Legalpedia.Annotations
                 .ToList();
         }
 
-        public List<Annotation> Search(string term)
+        public PagedResultDto<Annotation> Search(SearchAnnotationInput input)
         {
-            return _repository.GetAll().Where(
-                    an => (an.Comment.ToLower().Contains(term.ToLower()) ||
-                           an.Replies.ToLower().Contains(term.ToLower())) &&
+            var items = _repository.GetAll().Where(
+                    an => (an.Comment.ToLower().Contains(input.Term.ToLower()) ||
+                           an.Replies.ToLower().Contains(input.Term.ToLower())) &&
                           (an.UserId == AbpSession.UserId.Value ||
-                           an.Visibility == Visibility.Public))
+                           an.Visibility == Visibility.Public)).OrderBy(an=>an.Comment.Length)
+                .Skip(input.SkipCount).Take(input.MaxResultCount)
                 .ToList();
+
+            var totalCount = _repository.GetAll().Count(
+                an => (an.Comment.ToLower().Contains(input.Term.ToLower()) ||
+                       an.Replies.ToLower().Contains(input.Term.ToLower())) &&
+                      (an.UserId == AbpSession.UserId.Value ||
+                       an.Visibility == Visibility.Public));
+
+            return new PagedResultDto<Annotation>(totalCount, items);
         }
 
         public List<string> Tags()

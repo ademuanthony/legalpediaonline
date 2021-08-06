@@ -58,6 +58,7 @@ namespace Legalpedia.EntityFrameworkCore
         public DbSet<OneTimePassword> OneTimePasswords { get; set; }
         public DbSet<OtpLicense> OtpLicenses { get; set; }
         public DbSet<Package> Packages { get; set; }
+        public DbSet<PackageConfig> PackageConfigs { get; set; }
         public DbSet<PartyAType> PartyATypes { get; set; }
         public DbSet<PartyBType> PartyBTypes { get; set; }
         public DbSet<Principle> Principles { get; set; }
