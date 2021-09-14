@@ -10,6 +10,8 @@ using Legalpedia.Models;
 using Legalpedia.Packages.Dto;
 using Legalpedia.Roles;
 using System.Threading.Tasks;
+using Legalpedia.Judgements.Dto;
+using Legalpedia.Summaries.Dtos;
 
 namespace Legalpedia.Packages
 {
@@ -111,6 +113,39 @@ namespace Legalpedia.Packages
             var id = await _packageConfigRepository.InsertAndGetIdAsync(input);
             input.Id = id;
             return input;
+        }
+
+        public bool CanAccessCase(JudgementSummaryViewModel judgementDto, Package package)
+        {
+            var config = package.PackageConfigs.FirstOrDefault(c =>
+                c.ResourceIdLabel == ResourceIdLabel.Cases);
+            if (config is {ResourceIdValue: PackageConfig.ResourceIdValueAll}) return true;
+            
+            var areaOfLawConfigs = package.PackageConfigs.Where(c =>
+                c.ResourceIdLabel == ResourceIdLabel.Cases);
+            if (areaOfLawConfigs.Any(areaOfLawConfig => judgementDto.AreasOfLaw.Contains(areaOfLawConfig.ResourceIdValue)))
+            {
+                return true;
+            }
+            
+            var courtConfigs = package.PackageConfigs.Where(c =>
+                c.ResourceIdLabel == ResourceIdLabel.CasesByCourt);
+            if (courtConfigs.Any(courtConfig => judgementDto.Court == courtConfig.ResourceIdValue))
+            {
+                return true;
+            }
+            
+            var yearConfigs = package.PackageConfigs.Where(c =>
+                c.ResourceIdLabel == ResourceIdLabel.CasesByYear);
+            if (yearConfigs.Any(yearConfig => judgementDto.JudgementDate?.Year.ToString() == yearConfig.ResourceIdValue))
+            {
+                return true;
+            }
+            
+            var snConfigs = package.PackageConfigs.Where(c =>
+                c.ResourceIdLabel == ResourceIdLabel.CaseBySuiteNumber);
+
+            return snConfigs.Any(snConfig => snConfig.ResourceIdValue == judgementDto.SuitNo);
         }
     }
 }
