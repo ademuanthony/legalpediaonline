@@ -8,6 +8,7 @@ namespace Legalpedia.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            return;
             migrationBuilder.CreateTable(
                 name: "AbpAuditLogs",
                 columns: table => new

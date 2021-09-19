@@ -3,7 +3,7 @@ using Abp.Domain.Entities;
 
 namespace Legalpedia.Models
 {
-    [Table("rules")]
+    [Table("Rules")]
     public class Rule:Entity
     {
         [Column("uuid")]

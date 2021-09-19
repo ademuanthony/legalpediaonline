@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
@@ -9,6 +10,8 @@ using Legalpedia.Models;
 using Legalpedia.Packages.Dto;
 using Legalpedia.Roles;
 using System.Threading.Tasks;
+using Legalpedia.Judgements.Dto;
+using Legalpedia.Summaries.Dtos;
 
 namespace Legalpedia.Packages
 {
@@ -18,11 +21,13 @@ namespace Legalpedia.Packages
     {
         IRoleAppService _roleService;
         IRepository<Role> _roleRepository;
+        private IRepository<PackageConfig> _packageConfigRepository;
 
-        public PackagesAppService(IRepository<Package> repository, IRoleAppService roleService, IRepository<Role> roleRepository) : base(repository)
+        public PackagesAppService(IRepository<Package> repository, IRoleAppService roleService, IRepository<Role> roleRepository, IRepository<PackageConfig> packageConfigRepository) : base(repository)
         {
             _roleService = roleService;
             _roleRepository = roleRepository;
+            _packageConfigRepository = packageConfigRepository;
         }
 
         public PackageDto GetByKey(string key)
@@ -59,7 +64,15 @@ namespace Legalpedia.Packages
                     Price = input.Price,
                     Id = Repository.GetAll().Max(p => p.Id) + 1
                 };
-                await Repository.InsertAsync(pkg);
+                var id = await Repository.InsertAndGetIdAsync(pkg);
+
+                var keys = new List<ResourceIdLabel>();
+                foreach (var packageConfig in input.PackageConfigs.Where(packageConfig => !keys.Contains(packageConfig.ResourceIdLabel)))
+                {
+                    packageConfig.Id = id;
+                    await _packageConfigRepository.InsertAsync(packageConfig);
+                    keys.Add(packageConfig.ResourceIdLabel);
+                }
                 
                 return ObjectMapper.Map<PackageDto>(pkg);
             }
@@ -88,6 +101,51 @@ namespace Legalpedia.Packages
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        public async Task RemovePackageConfig(EntityDto input)
+        {
+            await _packageConfigRepository.DeleteAsync(pc=>pc.Id == input.Id);
+        }
+
+        public async Task<PackageConfig> AddPackageConfig(PackageConfig input)
+        {
+            var id = await _packageConfigRepository.InsertAndGetIdAsync(input);
+            input.Id = id;
+            return input;
+        }
+
+        public bool CanAccessCase(JudgementSummaryViewModel judgementDto, Package package)
+        {
+            var config = package.PackageConfigs.FirstOrDefault(c =>
+                c.ResourceIdLabel == ResourceIdLabel.Cases);
+            if (config is {ResourceIdValue: PackageConfig.ResourceIdValueAll}) return true;
+            
+            var areaOfLawConfigs = package.PackageConfigs.Where(c =>
+                c.ResourceIdLabel == ResourceIdLabel.Cases);
+            if (areaOfLawConfigs.Any(areaOfLawConfig => judgementDto.AreasOfLaw.Contains(areaOfLawConfig.ResourceIdValue)))
+            {
+                return true;
+            }
+            
+            var courtConfigs = package.PackageConfigs.Where(c =>
+                c.ResourceIdLabel == ResourceIdLabel.CasesByCourt);
+            if (courtConfigs.Any(courtConfig => judgementDto.Court == courtConfig.ResourceIdValue))
+            {
+                return true;
+            }
+            
+            var yearConfigs = package.PackageConfigs.Where(c =>
+                c.ResourceIdLabel == ResourceIdLabel.CasesByYear);
+            if (yearConfigs.Any(yearConfig => judgementDto.JudgementDate?.Year.ToString() == yearConfig.ResourceIdValue))
+            {
+                return true;
+            }
+            
+            var snConfigs = package.PackageConfigs.Where(c =>
+                c.ResourceIdLabel == ResourceIdLabel.CaseBySuiteNumber);
+
+            return snConfigs.Any(snConfig => snConfig.ResourceIdValue == judgementDto.SuitNo);
         }
     }
 }

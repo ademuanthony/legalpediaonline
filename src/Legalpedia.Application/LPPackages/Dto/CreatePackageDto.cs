@@ -1,4 +1,5 @@
-﻿using Abp.Application.Services.Dto;
+﻿using System.Collections.Generic;
+using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
 using Legalpedia.Models;
 
@@ -21,5 +22,7 @@ namespace Legalpedia.Packages.Dto
 
         public double Price { get; set; }
         public int Days { get; set; }
+        
+        public List<PackageConfig> PackageConfigs { get; set; }
     }
 }

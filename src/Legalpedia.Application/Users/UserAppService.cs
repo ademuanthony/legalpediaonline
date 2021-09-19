@@ -181,11 +181,7 @@ namespace Legalpedia.Users
         }
         public async Task<UserPicture> ProfilePicture(long userId)
         {
-            var picture = await _pictureRepository.FirstOrDefaultAsync(p => p.UserId == userId);
-            if (picture == null)
-            {
-                throw new UserFriendlyException("Picture not found");
-            }
+            var picture = await _pictureRepository.FirstOrDefaultAsync(p => p.UserId == userId) ?? new UserPicture();
 
             return picture;
         }

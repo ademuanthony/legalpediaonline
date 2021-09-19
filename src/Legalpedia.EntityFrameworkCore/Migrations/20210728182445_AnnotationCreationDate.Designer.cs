@@ -3,15 +3,17 @@ using System;
 using Legalpedia.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Legalpedia.Migrations
 {
     [DbContext(typeof(LegalpediaDbContext))]
-    partial class LegalpediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210728182445_AnnotationCreationDate")]
+    partial class AnnotationCreationDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2624,29 +2626,6 @@ namespace Legalpedia.Migrations
                     b.ToTable("Packages");
                 });
 
-            modelBuilder.Entity("Legalpedia.Models.PackageConfig", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<int>("PackageId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ResourceIdLabel")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ResourceIdValue")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PackageId");
-
-                    b.ToTable("PackageConfigs");
-                });
-
             modelBuilder.Entity("Legalpedia.Models.PartyAType", b =>
                 {
                     b.Property<int>("Id")
@@ -3399,17 +3378,6 @@ namespace Legalpedia.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("Legalpedia.Models.PackageConfig", b =>
-                {
-                    b.HasOne("Legalpedia.Models.Package", "Package")
-                        .WithMany("PackageConfigs")
-                        .HasForeignKey("PackageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Package");
-                });
-
             modelBuilder.Entity("Legalpedia.Models.SumAreasOfLaw", b =>
                 {
                     b.HasOne("Legalpedia.Models.AreaOfLaw", "AreaOfLaw")
@@ -3539,11 +3507,6 @@ namespace Legalpedia.Migrations
             modelBuilder.Entity("Legalpedia.Models.Customer", b =>
                 {
                     b.Navigation("Licenses");
-                });
-
-            modelBuilder.Entity("Legalpedia.Models.Package", b =>
-                {
-                    b.Navigation("PackageConfigs");
                 });
 #pragma warning restore 612, 618
         }

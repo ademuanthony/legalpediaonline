@@ -20,7 +20,9 @@ namespace Legalpedia.Rules
 
         public List<string> GetNames(string ruleType)
         {
-            return _repository.GetAll().Where(r => r.Type == ruleType).Select(r => r.Name).Distinct().ToList();
+            // Unique names
+            var names = _repository.GetAll().Where(r => r.Type == ruleType).Select(r => r.Name).Distinct().ToList();
+            return names;
         }
 
         public bool Create(RuleDto rule)

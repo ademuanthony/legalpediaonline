@@ -27,5 +27,7 @@ namespace Legalpedia.Models
 
         public double Price { get; set; }
         public int Days { get; set; }
+        
+        public ICollection<PackageConfig> PackageConfigs { get; set; }
     }
 }

@@ -23,6 +23,8 @@ namespace Legalpedia.EntityFrameworkCore
         public DbSet<SharedNote> SharedNotes { get; set; }
         public DbSet<NoteRating> NoteRatings { get; set; }
         
+        public DbSet<Annotation> Anotations { get; set; }
+        public DbSet<AnnotationTag> AnnotationTags { get; set; }
         public DbSet<AreaOfLaw> AreaOfLaws { get; set; }
         public DbSet<Article> Articles { get; set; }
         public DbSet<Bookmark> Bookmarks { get; set; }
@@ -34,7 +36,6 @@ namespace Legalpedia.EntityFrameworkCore
         public DbSet<Dictionary> Dictonaries { get; set; }
         public DbSet<ForeignLegalResource> ForeignLegalResources { get; set; }
         public DbSet<FormsPrecedence> FormsPrecedences { get; set; }
-        public DbSet<Highlight> Highlights { get; set; }
         public DbSet<HoldenAt> HoldenAts { get; set; }
         public DbSet<Index> Indices { get; set; }
         public DbSet<Judgement> Judgements { get; set; }
@@ -57,6 +58,7 @@ namespace Legalpedia.EntityFrameworkCore
         public DbSet<OneTimePassword> OneTimePasswords { get; set; }
         public DbSet<OtpLicense> OtpLicenses { get; set; }
         public DbSet<Package> Packages { get; set; }
+        public DbSet<PackageConfig> PackageConfigs { get; set; }
         public DbSet<PartyAType> PartyATypes { get; set; }
         public DbSet<PartyBType> PartyBTypes { get; set; }
         public DbSet<Principle> Principles { get; set; }
