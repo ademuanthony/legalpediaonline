@@ -7,9 +7,9 @@ namespace Legalpedia.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_rules",
-                table: "rules");
+            // migrationBuilder.DropPrimaryKey(
+            //     name: "PK_rules",
+            //     table: "rules");
 
             migrationBuilder.RenameTable(
                 name: "rules",
@@ -22,10 +22,10 @@ namespace Legalpedia.Migrations
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Rules",
-                table: "Rules",
-                column: "Id");
+            // migrationBuilder.AddPrimaryKey(
+            //     name: "PK_Rules",
+            //     table: "Rules",
+            //     column: "Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
