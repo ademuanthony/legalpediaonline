@@ -43,6 +43,9 @@ namespace Legalpedia.Models
     {
         public string NoteId { get; set; }
         public long UserId { get; set; }
+
+        [CanBeNull] 
+        public string TeamId{get;set;}
         
         public long? TargetUserId { get; set; }
         public DateTime CreatedAt { get; set; }

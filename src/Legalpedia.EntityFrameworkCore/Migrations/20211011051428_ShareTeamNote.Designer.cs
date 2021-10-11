@@ -3,15 +3,17 @@ using System;
 using Legalpedia.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Legalpedia.Migrations
 {
     [DbContext(typeof(LegalpediaDbContext))]
-    partial class LegalpediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211011051428_ShareTeamNote")]
+    partial class ShareTeamNote
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1435,12 +1437,6 @@ namespace Legalpedia.Migrations
                         .HasMaxLength(328)
                         .HasColumnType("character varying(328)");
 
-                    b.Property<string>("Facebook")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Intagram")
-                        .HasColumnType("text");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -1464,9 +1460,6 @@ namespace Legalpedia.Migrations
 
                     b.Property<long?>("LastModifierUserId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("Linedin")
-                        .HasColumnType("text");
 
                     b.Property<DateTime?>("LockoutEndDateUtc")
                         .HasColumnType("timestamp without time zone");
@@ -2864,9 +2857,6 @@ namespace Legalpedia.Migrations
 
                     b.Property<long?>("TargetUserId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("TeamId")
-                        .HasColumnType("text");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");

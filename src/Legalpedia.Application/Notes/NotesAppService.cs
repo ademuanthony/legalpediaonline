@@ -167,17 +167,19 @@ namespace Legalpedia.Notes
             var fNotes = MarkFavourites(ObjectMapper.Map<List<NoteDto>>(notes));
             return new PagedResultDto<NoteDto>(totalCount, fNotes);
         }
-        
+         
         public PagedResultDto<NoteDto> TeamNotes(TeamNotesRequest input)
         {
+            var sharedIds = _sharedNoteRepository.GetAll().Where(s => s.TeamId == input.TeamId).Select(s => s.NoteId).Distinct().ToList();
+
             var query = _noteRepository.GetAll()
-                .Where(n => n.TeamId == input.TeamId);
+                .Where(n => n.TeamId == input.TeamId || sharedIds.Contains(n.Id));
             if (!input.SearchTerm.IsNullOrEmpty())
             {
                 query = query.Where(n => n.Title.ToLower().Contains(input.SearchTerm.ToLower()));
             }
             var totalCount = query.Count();
-            var notes = query.OrderBy(n => n.CreatedAt)
+            var notes = query.OrderByDescending(n => n.CreatedAt)
                 .Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
             
             var fNotes = MarkFavourites(ObjectMapper.Map<List<NoteDto>>(notes));

@@ -32,6 +32,10 @@ namespace Legalpedia.Users.Dto
         public string FullName { get; set; }
         
         public string Bio { get; set; }
+        public string Twitter{ get; set; }
+        public string Linedin { get; set; }
+        public string Facebook {get; set; }
+        public string Intagram {get; set;}
 
         public DateTime? LastLoginTime { get; set; }
 
