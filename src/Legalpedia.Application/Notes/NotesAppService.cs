@@ -321,10 +321,11 @@ namespace Legalpedia.Notes
 
         public async Task<bool> Share(ShareInput input)
         {
-            var oldRec = await _sharedNoteRepository
-                .FirstOrDefaultAsync(n => n.UserId == AbpSession.UserId.Value && n.NoteId == input.Id);
-            if (oldRec != null) return oldRec;
+            
             if(input.TeamIds.Count() == 0) {
+                var oldRec = await _sharedNoteRepository
+                .FirstOrDefaultAsync(n => n.UserId == AbpSession.UserId.Value && n.NoteId == input.NoteId);
+                if (oldRec != null) return true;
 
                 var sn = new SharedNote
                 {
@@ -336,6 +337,10 @@ namespace Legalpedia.Notes
                 await _sharedNoteRepository.InsertAsync(sn);
             } else {
                 foreach(var id in input.TeamIds) {
+
+                    var oldRec = await _sharedNoteRepository
+                        .FirstOrDefaultAsync(n => n.TeamId == id && n.NoteId == input.NoteId);
+                    if (oldRec != null) continue;
 
                     var sn = new SharedNote
                     {
