@@ -319,20 +319,36 @@ namespace Legalpedia.Notes
             return new NoteRatingResult(total, count);
         }
 
-        public async Task<SharedNote> Share(EntityDto<string> input)
+        public async Task<bool> Share(ShareInput input)
         {
             var oldRec = await _sharedNoteRepository
                 .FirstOrDefaultAsync(n => n.UserId == AbpSession.UserId.Value && n.NoteId == input.Id);
             if (oldRec != null) return oldRec;
-            var sn = new SharedNote
-            {
-                NoteId = input.Id,
-                UserId = AbpSession.UserId.Value,
-                CreatedAt = DateTime.Now,
-                Id = Guid.NewGuid().ToString()
-            };
-            await _sharedNoteRepository.InsertAsync(sn);
-            return sn;
+            if(input.TeamIds.Count() == 0) {
+
+                var sn = new SharedNote
+                {
+                    NoteId = input.NoteId,
+                    UserId = AbpSession.UserId.Value,
+                    CreatedAt = DateTime.Now,
+                    Id = Guid.NewGuid().ToString()
+                };
+                await _sharedNoteRepository.InsertAsync(sn);
+            } else {
+                foreach(var id in input.TeamIds) {
+
+                    var sn = new SharedNote
+                    {
+                        NoteId = input.NoteId,
+                        TeamId = id,
+                        UserId = AbpSession.UserId.Value,
+                        CreatedAt = DateTime.Now,
+                        Id = Guid.NewGuid().ToString()
+                    };
+                    await _sharedNoteRepository.InsertAsync(sn);
+                }
+            }
+            return true;
         }
 
         public List<Note> SharedNotesByUser(EntityDto<long> input)

@@ -10,9 +10,11 @@ namespace Legalpedia.Authorization.Users
         public string Bio { get; set; }
         public string Twitter{ get; set; }
         public string Linedin { get; set; }
-        public string Facebook {get; set; }
-        public string Intagram {get; set;}
-
+        public string Facebook { get; set; }
+        public string Instagram { get; set; }
+        public string AreaOfPractice { get; set; }
+        public string Website { get; set; }
+        public int CallToBarYear { get; set; }
         
         public const string DefaultPassword = "123qwe";
 
@@ -37,5 +39,16 @@ namespace Legalpedia.Authorization.Users
 
             return user;
         }
+    }
+
+    public class UserDetail{
+        public string Bio { get; set; }
+        public string Twitter{ get; set; }
+        public string Linedin { get; set; }
+        public string Facebook { get; set; }
+        public string Instagram { get; set; }
+        public string AreaOfPractice { get; set; }
+        public string Website { get; set; }
+        public int CallToBarYear { get; set; }
     }
 }

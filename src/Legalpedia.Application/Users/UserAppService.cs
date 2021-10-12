@@ -121,6 +121,24 @@ namespace Legalpedia.Users
             return ObjectMapper.Map<UserDto>(user);
         }
         
+
+        public async Task<UserDto> UpdateDetail(UserDetail input) {
+            if (AbpSession.UserId == null)
+            {
+                throw new UserFriendlyException("Please login to update your profile");
+            }
+            var user = await _userManager.GetUserByIdAsync(AbpSession.UserId.Value);
+            user.Bio = input.Bio;
+            user.Instagram = input.Instagram;
+            user.Twitter = input.Twitter;
+            user.Facebook = input.Facebook;
+            user.Website = input.Website;
+            user.Linedin = input.Linedin;
+            user.CallToBarYear = input.CallToBarYear;
+            CheckErrors(await _userManager.UpdateAsync(user));
+            return ObjectMapper.Map<UserDto>(user);
+        }
+
         public async Task<bool> ChangeProfilePicture(ChangePictureInput input)
         {
             try 

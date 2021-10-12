@@ -9,6 +9,7 @@ namespace Legalpedia.Annotations
         Annotation Create(Annotation input);
         void Clear(string id);
         List<Annotation> GetAll(string caseId, ContentType contentType);
+        List<Annotation> PublishedNotes();
         PagedResultDto<Annotation> Search(SearchAnnotationInput input);
         List<string> Tags();
     }
