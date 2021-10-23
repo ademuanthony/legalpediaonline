@@ -170,7 +170,8 @@ namespace Legalpedia.Notes
          
         public PagedResultDto<NoteDto> TeamNotes(TeamNotesRequest input)
         {
-            var sharedIds = _sharedNoteRepository.GetAll().Where(s => s.TeamId == input.TeamId).Select(s => s.NoteId).Distinct().ToList();
+            var sharedNotes = _sharedNoteRepository.GetAll().ToList();
+            var sharedIds = sharedNotes.Where(s => s.TeamId == input.TeamId).Select(s => s.NoteId);
 
             var query = _noteRepository.GetAll()
                 .Where(n => n.TeamId == input.TeamId || sharedIds.Contains(n.Id));
