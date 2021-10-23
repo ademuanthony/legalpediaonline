@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Abp.Domain.Entities;
 using JetBrains.Annotations;
 
@@ -43,9 +44,17 @@ namespace Legalpedia.Models
     {
         public string NoteId { get; set; }
         public long UserId { get; set; }
+
+        [CanBeNull] 
+        public string TeamId{get;set;}
         
         public long? TargetUserId { get; set; }
         public DateTime CreatedAt { get; set; }
+    }
+
+    public class ShareInput {
+        public string NoteId{get;set;}
+        public List<string> TeamIds {get;set;}
     }
 
     public class NoteRating:Entity<string>

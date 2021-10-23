@@ -90,6 +90,14 @@ namespace Legalpedia.Annotations
                 .ToList();
         }
 
+        public List<Annotation> PublishedNotes()
+        {
+            return _repository.GetAll()
+                .Where(an => an.UserId == AbpSession.UserId.Value && an.Comment != "")
+                .OrderByDescending(an =>an.CreationDate)
+                .ToList();
+        }
+
         public PagedResultDto<Annotation> Search(SearchAnnotationInput input)
         {
             var items = _repository.GetAll().Where(

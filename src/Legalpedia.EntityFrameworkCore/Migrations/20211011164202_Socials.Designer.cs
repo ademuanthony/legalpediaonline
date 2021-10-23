@@ -3,15 +3,17 @@ using System;
 using Legalpedia.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Legalpedia.Migrations
 {
     [DbContext(typeof(LegalpediaDbContext))]
-    partial class LegalpediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211011164202_Socials")]
+    partial class Socials
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1402,18 +1404,12 @@ namespace Legalpedia.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
-                    b.Property<string>("AreaOfPractice")
-                        .HasColumnType("text");
-
                     b.Property<string>("AuthenticationSource")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
                     b.Property<string>("Bio")
                         .HasColumnType("text");
-
-                    b.Property<int>("CallToBarYear")
-                        .HasColumnType("integer");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -1444,7 +1440,7 @@ namespace Legalpedia.Migrations
                     b.Property<string>("Facebook")
                         .HasColumnType("text");
 
-                    b.Property<string>("Instagram")
+                    b.Property<string>("Intagram")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
@@ -1524,9 +1520,6 @@ namespace Legalpedia.Migrations
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
-
-                    b.Property<string>("Website")
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

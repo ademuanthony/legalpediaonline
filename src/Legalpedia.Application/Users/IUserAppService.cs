@@ -22,5 +22,6 @@ namespace Legalpedia.Users
         Task<UserPicture> MyProfilePicture();
         Task<UserPicture> ProfilePicture(long userId);
         Task<UserDto> UpdateBio(UpdateBioInput input);
+        Task<UserDto> UpdateDetail(UserDetail input);
     }
 }

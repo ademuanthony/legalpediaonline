@@ -167,17 +167,20 @@ namespace Legalpedia.Notes
             var fNotes = MarkFavourites(ObjectMapper.Map<List<NoteDto>>(notes));
             return new PagedResultDto<NoteDto>(totalCount, fNotes);
         }
-        
+         
         public PagedResultDto<NoteDto> TeamNotes(TeamNotesRequest input)
         {
+            var sharedNotes = _sharedNoteRepository.GetAll().ToList();
+            var sharedIds = sharedNotes.Where(s => s.TeamId == input.TeamId).Select(s => s.NoteId);
+
             var query = _noteRepository.GetAll()
-                .Where(n => n.TeamId == input.TeamId);
+                .Where(n => n.TeamId == input.TeamId || sharedIds.Contains(n.Id));
             if (!input.SearchTerm.IsNullOrEmpty())
             {
                 query = query.Where(n => n.Title.ToLower().Contains(input.SearchTerm.ToLower()));
             }
             var totalCount = query.Count();
-            var notes = query.OrderBy(n => n.CreatedAt)
+            var notes = query.OrderByDescending(n => n.CreatedAt)
                 .Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
             
             var fNotes = MarkFavourites(ObjectMapper.Map<List<NoteDto>>(notes));
@@ -317,20 +320,41 @@ namespace Legalpedia.Notes
             return new NoteRatingResult(total, count);
         }
 
-        public async Task<SharedNote> Share(EntityDto<string> input)
+        public async Task<bool> Share(ShareInput input)
         {
-            var oldRec = await _sharedNoteRepository
-                .FirstOrDefaultAsync(n => n.UserId == AbpSession.UserId.Value && n.NoteId == input.Id);
-            if (oldRec != null) return oldRec;
-            var sn = new SharedNote
-            {
-                NoteId = input.Id,
-                UserId = AbpSession.UserId.Value,
-                CreatedAt = DateTime.Now,
-                Id = Guid.NewGuid().ToString()
-            };
-            await _sharedNoteRepository.InsertAsync(sn);
-            return sn;
+            
+            if(input.TeamIds.Count() == 0) {
+                var oldRec = await _sharedNoteRepository
+                .FirstOrDefaultAsync(n => n.UserId == AbpSession.UserId.Value && n.NoteId == input.NoteId);
+                if (oldRec != null) return true;
+
+                var sn = new SharedNote
+                {
+                    NoteId = input.NoteId,
+                    UserId = AbpSession.UserId.Value,
+                    CreatedAt = DateTime.Now,
+                    Id = Guid.NewGuid().ToString()
+                };
+                await _sharedNoteRepository.InsertAsync(sn);
+            } else {
+                foreach(var id in input.TeamIds) {
+
+                    var oldRec = await _sharedNoteRepository
+                        .FirstOrDefaultAsync(n => n.TeamId == id && n.NoteId == input.NoteId);
+                    if (oldRec != null) continue;
+
+                    var sn = new SharedNote
+                    {
+                        NoteId = input.NoteId,
+                        TeamId = id,
+                        UserId = AbpSession.UserId.Value,
+                        CreatedAt = DateTime.Now,
+                        Id = Guid.NewGuid().ToString()
+                    };
+                    await _sharedNoteRepository.InsertAsync(sn);
+                }
+            }
+            return true;
         }
 
         public List<Note> SharedNotesByUser(EntityDto<long> input)
